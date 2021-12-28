@@ -14,7 +14,6 @@ import nest_asyncio
 nest_asyncio.apply()
 
 import os
-from dotenv import load_dotenv
 
 import pycmd
 
@@ -27,6 +26,7 @@ from discord.ext import commands
 from collections import defaultdict
 
 from datetime import datetime
+from .utils.config import Config
 
 
 pythonState = defaultdict(str)  # dict containing user:state pairs
@@ -54,8 +54,8 @@ helpComments = {
 sender = SentMedia()  # initialize SentMedia
 saver = SavedMedia()  # initialize SavedMedia
 
-load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')  # Abstract token from another file
+config = Config()
+TOKEN = config.get_parameter("DISCORD_TOKEN")  # Abstract token from another file
 
 bot = commands.Bot(command_prefix='!')
 
