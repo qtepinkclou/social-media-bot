@@ -32,11 +32,11 @@ def saveToFile(text, fileName):
 
 
 def runTheFile(fileName):
-    r"""Run saved file as Python script.
+    """Run saved file as Python script.
 
     :param fileName: Name of the fileName to run as Python script
     :type fileName: string
-    :return: Return of the Python script (lines seperated by \n)
+    :return: Return of the Python script (lines seperated by \\n)
     :rtype: string
     """
     with io.StringIO() as buf, redirect_stdout(buf):

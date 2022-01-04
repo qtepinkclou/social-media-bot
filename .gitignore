@@ -1,0 +1,6 @@
+.env
+Permanent/*
+Temporary/*
+docs/*
+Pipfile
+Pipfile.lock
