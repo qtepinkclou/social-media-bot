@@ -13,8 +13,10 @@ Identified problems:
 
 * Due to an error yet unknown, media downloads are sometimes halted, but does not break the code. Check terminal to ensure there is no error until it is fixed.
 
+* Not sure which req.txt is more suitable so included both for now.
+
 **Currently supported modules are**
 
-    #.``pydiscmd``
+    #. ``pydiscmd``
 
-    #.``getmedia``
+    #. ``getmedia``
