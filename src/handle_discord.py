@@ -28,8 +28,7 @@ from .utils.config import Config
 
 pythonState = defaultdict(str)  # dict containing user:state pairs
 
-# Does this really belong here?
-helpComments = {
+helpComments = {  # Does this really belong here?
     'togglePython':
     'Toggle between Discord chat prompt and Python command prompt.',
 
