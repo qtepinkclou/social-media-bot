@@ -1,5 +1,6 @@
-Permanent/*
-Temporary/*
+src/Permanent/*
+src/Temporary/*
 docs/*
 Pipfile
 Pipfile.lock
+src/utils/.env

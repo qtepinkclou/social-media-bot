@@ -8,8 +8,21 @@ Scripts are written in Python 3.9.7
 
 This project is under active development.
 
+
+"""""""""""""
+(Some) Changes Made:
+"""""""""""""
+
+* Started employing ``pdoc3`` instead of ``sphinx`` for documentation.
+
+* Changed the content of ``.gitignore``, so that the documentation files with .html extension that are created via ``pdoc3`` will not be committed. This means there is no on-the-go documentation for the program hosted over github-pages. You have to run ``pdoc3`` on your own machine.
+
+* Filing structure is changed.
+
+* Primitive use of ``config.py`` is employed. (More to come..)
+
 """"""""""""""""""""
-Identified problems:
+Identified Problems:
 """"""""""""""""""""
 
 * pdoc3 cannot document most of the functions in ``handle_discord``. Refer to script until fixed.
