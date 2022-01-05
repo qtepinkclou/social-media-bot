@@ -1,6 +1,6 @@
-==============================
-bananaBread: A Bot for Discord
-==============================
+====================================
+**bananaBread**: *A Bot for Discord*
+====================================
 
 **bananaBread** is a Python library for managing a Discord Bot
 
