@@ -7,7 +7,9 @@ Scripts are written in Python 3.9.7
 
 This project is under active development.
 
+""""""""""""""""""""
 Identified problems:
+""""""""""""""""""""
 
 * pdoc3 cannot document most of the functions in ``handle_discord``. Refer to script until fixed.
 
