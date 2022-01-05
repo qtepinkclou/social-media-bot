@@ -15,6 +15,8 @@ Identified problems:
 
 * Not sure which req.txt is more suitable so included both for now.
 
+* Guide for reStructuredText is used when writing docstrings. Therefore documentation may look a bit bizarre until fixed.
+
 **Currently supported modules are**
 
     #. ``pydiscmd``
