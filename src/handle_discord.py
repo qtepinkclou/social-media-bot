@@ -1,6 +1,6 @@
 """Discord API to host several functionalities.
 Currently supported modules are:
-    ``pycmd``
+    ``pydiscmd``
     ``getmedia``
 """
 
@@ -12,7 +12,7 @@ nest_asyncio.apply()
 
 import os
 
-import pycmd
+import pydiscmd
 
 from getmedia import SentMedia
 from getmedia import SavedMedia
@@ -23,7 +23,7 @@ from discord.ext import commands
 from collections import defaultdict
 
 from datetime import datetime
-from .utils.config import Config
+from utils.config import Config
 
 
 pythonState = defaultdict(str)  # dict containing user:state pairs
@@ -94,6 +94,7 @@ async def change_state(ctx):
 @bot.command(name='sendMedia', help=helpComments['sendMedia'])
 async def sendMedia(ctx, *url):
     """Directly acquire and do not store media from multiple URLs.
+
     :param url: Variable length argument list of URLs
     :type url: List of string
     """
@@ -116,6 +117,7 @@ async def sendMedia(ctx, *url):
 @bot.command(name='saveMedia', help=helpComments['saveMedia'])
 async def saveMedia(ctx, cmd, *url):
     """Save media from multiple URLs under a keyword.
+
     :param cmd: Keyword related with saved media
     :type cmd: string
     :param url: Variable length argument list of URLs
@@ -141,6 +143,7 @@ async def saveMedia(ctx, cmd, *url):
 @bot.command(name='deleteMedia', help=helpComments['deleteMedia'])
 async def deleteMedia(ctx, cmd='fold'):
     """Delete media related with given keyword.
+
     :param cmd: Keyword related with saved media
     :type cmd: string, optional
     """
@@ -158,6 +161,7 @@ async def deleteMedia(ctx, cmd='fold'):
 @bot.command(name='printMedia', help=helpComments['printMedia'])
 async def printMedia(ctx, cmd='fold'):
     """Show a list of saved media under given keyword.
+
     :param cmd: Keyword related with saved media
     :type cmd: string, optional
     """
@@ -175,6 +179,7 @@ async def printMedia(ctx, cmd='fold'):
 @bot.command(name='showMedia', help=helpComments['showMedia'])
 async def showMedia(ctx, cmd='fold'):
     """Acquire saved media under given keyword.
+
     :param cmd: Keyword related with saved media
     :type cmd: string, optional
     """
@@ -197,11 +202,11 @@ async def on_message(message):
     userName = message.author.name
 
     if pythonState[userName] == 'running':
-        _message = pycmd.toText(message)
-        rawOutputList = pycmd.processCmd(_message, pycmd.fillerFile)
+        _message = pydiscmd.toText(message)
+        rawOutputList = pydiscmd.processCmd(_message, pydiscmd.fillerFile)
 
         finalOutputList = [
-                           pycmd.modifyOutput(item, mod='o')
+                           pydiscmd.modifyOutput(item, mod='o')
                            for item in rawOutputList
                            ]
 

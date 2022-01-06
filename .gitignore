@@ -3,4 +3,4 @@ src/Temporary/*
 docs/*
 Pipfile
 Pipfile.lock
-src/utils/.env
+src/.env
