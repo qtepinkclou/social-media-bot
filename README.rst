@@ -8,15 +8,6 @@
 
 * This project is under active development.
 
-* Documentation can be found `here <https://kktnl.github.io/functional-discord-bot/>`_ << - This project is not functional :))
-
-* Currently supported modules are:
-
-    * ``pycmd``
-
-    * ``getmedia``
-    
-
 """""""""""""
 (Some) Changes Made:
 """""""""""""
