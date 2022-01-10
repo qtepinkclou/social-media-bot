@@ -1,5 +1,0 @@
-discord.py==1.7.3
-instaloader==4.8.2
-nest_asyncio==1.5.1
-python-dotenv==0.19.2
-youtube_dl==2021.6.6

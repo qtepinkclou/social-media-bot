@@ -1,8 +1,7 @@
 """Discord API to host several functionalities.
 
 Currently supported modules are:
-
-    ``pycmd``
+    ``pydiscmd``
 
     ``getmedia``
 """
@@ -15,7 +14,7 @@ nest_asyncio.apply()
 
 import os
 
-import pycmd
+import pydiscmd
 
 from getmedia import SentMedia
 from getmedia import SavedMedia
@@ -26,12 +25,13 @@ from discord.ext import commands
 from collections import defaultdict
 
 from datetime import datetime
-from .utils.config import Config
+
+from utils.config import Config
 
 
 pythonState = defaultdict(str)  # dict containing user:state pairs
 
-helpComments = {
+helpComments = {  # Does this really belong here?
     'togglePython':
     'Toggle between Discord chat prompt and Python command prompt.',
 
@@ -55,7 +55,8 @@ sender = SentMedia()  # initialize SentMedia
 saver = SavedMedia()  # initialize SavedMedia
 
 config = Config()
-TOKEN = config.get_parameter("DISCORD_TOKEN")  # Abstract token from another file
+
+TOKEN = config.get_parameter("DISCORD_TOKEN")  # Abstract token
 
 bot = commands.Bot(command_prefix='!')
 
@@ -205,11 +206,11 @@ async def on_message(message):
     userName = message.author.name
 
     if pythonState[userName] == 'running':
-        _message = pycmd.toText(message)
-        rawOutputList = pycmd.processCmd(_message, pycmd.fillerFile)
+        _message = pydiscmd.toText(message)
+        rawOutputList = pydiscmd.processCmd(_message, pydiscmd.fillerFile)
 
         finalOutputList = [
-                           pycmd.modifyOutput(item, mod='o')
+                           pydiscmd.modifyOutput(item, mod='o')
                            for item in rawOutputList
                            ]
 

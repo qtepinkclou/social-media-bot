@@ -1,2 +1,6 @@
-.env
+src/Permanent/*
+src/Temporary/*
 docs/*
+Pipfile
+Pipfile.lock
+src/.env
