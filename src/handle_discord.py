@@ -1,6 +1,8 @@
 """Discord API to host several functionalities.
+
 Currently supported modules are:
     ``pydiscmd``
+
     ``getmedia``
 """
 
@@ -23,6 +25,7 @@ from discord.ext import commands
 from collections import defaultdict
 
 from datetime import datetime
+
 from utils.config import Config
 
 
@@ -52,6 +55,7 @@ sender = SentMedia()  # initialize SentMedia
 saver = SavedMedia()  # initialize SavedMedia
 
 config = Config()
+
 TOKEN = config.get_parameter("DISCORD_TOKEN")  # Abstract token
 
 bot = commands.Bot(command_prefix='!')

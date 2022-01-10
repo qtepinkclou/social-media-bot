@@ -4,10 +4,18 @@
 
 **bananaBread** is a Python library for managing a Discord Bot
 
-Scripts are written in Python 3.9.7
+* Scripts are written in Python 3.9.7
 
-This project is under active development.
+* This project is under active development.
 
+* Documentation can be found `here <https://kktnl.github.io/functional-discord-bot/>`_ << - This project is not functional :))
+
+* Currently supported modules are:
+
+    * ``pycmd``
+
+    * ``getmedia``
+    
 
 """""""""""""
 (Some) Changes Made:
