@@ -25,10 +25,8 @@ from collections import defaultdict
 from datetime import datetime
 from utils.config import Config
 
-
-pythonState = defaultdict(str)  # dict containing user:state pairs
-
-helpComments = {  # Does this really belong here?
+# Constant variables
+HELP_COMMENTS = {
     'togglePython':
     'Toggle between Discord chat prompt and Python command prompt.',
 
@@ -48,6 +46,8 @@ helpComments = {  # Does this really belong here?
     'Acquire saved media under given keyword'
                }
 
+pythonState = defaultdict(str)  # dict containing user:state pairs
+
 sender = SentMedia()  # initialize SentMedia
 saver = SavedMedia()  # initialize SavedMedia
 
@@ -65,7 +65,7 @@ async def on_ready():
          )
 
 
-@bot.command(name='togglePython', help=helpComments['togglePython'])
+@bot.command(name='togglePython', help=HELP_COMMENTS['togglePython'])
 async def change_state(ctx):
     """Toggle between Discord chat prompt and Python command prompt."""
     global pythonState
@@ -91,7 +91,7 @@ async def change_state(ctx):
         pythonState[userName] = 'idle'
 
 
-@bot.command(name='sendMedia', help=helpComments['sendMedia'])
+@bot.command(name='sendMedia', help=HELP_COMMENTS['sendMedia'])
 async def sendMedia(ctx, *url):
     """Directly acquire and do not store media from multiple URLs.
 
@@ -114,7 +114,7 @@ async def sendMedia(ctx, *url):
     await ctx.send('Process time: {} seconds.'.format(timeTook))
 
 
-@bot.command(name='saveMedia', help=helpComments['saveMedia'])
+@bot.command(name='saveMedia', help=HELP_COMMENTS['saveMedia'])
 async def saveMedia(ctx, cmd, *url):
     """Save media from multiple URLs under a keyword.
 
@@ -140,7 +140,7 @@ async def saveMedia(ctx, cmd, *url):
     await ctx.send('Process time: {} seconds.'.format(timeTook))
 
 
-@bot.command(name='deleteMedia', help=helpComments['deleteMedia'])
+@bot.command(name='deleteMedia', help=HELP_COMMENTS['deleteMedia'])
 async def deleteMedia(ctx, cmd='fold'):
     """Delete media related with given keyword.
 
@@ -158,7 +158,7 @@ async def deleteMedia(ctx, cmd='fold'):
         await ctx.send(deletedMediaName)
 
 
-@bot.command(name='printMedia', help=helpComments['printMedia'])
+@bot.command(name='printMedia', help=HELP_COMMENTS['printMedia'])
 async def printMedia(ctx, cmd='fold'):
     """Show a list of saved media under given keyword.
 
@@ -176,7 +176,7 @@ async def printMedia(ctx, cmd='fold'):
         await ctx.send(savedMediaName)
 
 
-@bot.command(name='showMedia', help=helpComments['showMedia'])
+@bot.command(name='showMedia', help=HELP_COMMENTS['showMedia'])
 async def showMedia(ctx, cmd='fold'):
     """Acquire saved media under given keyword.
 
@@ -203,7 +203,7 @@ async def on_message(message):
 
     if pythonState[userName] == 'running':
         _message = pydiscmd.toText(message)
-        rawOutputList = pydiscmd.processCmd(_message, pydiscmd.fillerFile)
+        rawOutputList = pydiscmd.processCmd(_message)
 
         finalOutputList = [
                            pydiscmd.modifyOutput(item, mod='o')

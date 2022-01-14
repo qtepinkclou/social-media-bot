@@ -12,8 +12,8 @@ from youtube_dl import YoutubeDL
 from multiprocessing import Pool
 
 # Constant variables
-isInstaPattern = re.compile(r'instagram\.com/p/')
-instaPattern = re.compile(r'/p/(.+)/')
+IS_INSTA_PATTERN = re.compile(r'instagram\.com/p/')
+INSTA_SHORTCODE_PATTERN = re.compile(r'/p/(.+)/')
 
 
 def blockPrint():
@@ -49,7 +49,7 @@ class Media(metaclass=ABCMeta):
         :param url: URL of the media to be downloaded
         :type url: string
         """
-        shortCode = instaPattern.search(url).group(1)
+        shortCode = INSTA_SHORTCODE_PATTERN.search(url).group(1)
 
         instance = instaloader.Instaloader(
                                            download_video_thumbnails=False,
@@ -98,7 +98,7 @@ class Media(metaclass=ABCMeta):
 
         # Assign each URL to its respective method
         for URL in listOfURLs:
-            if isInstaPattern.search(URL):
+            if IS_INSTA_PATTERN.search(URL):
                 IG.append([pathIG, URL])
             else:
                 YT.append([pathYT, URL])

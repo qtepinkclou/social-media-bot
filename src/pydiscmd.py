@@ -3,8 +3,8 @@
 import io
 from contextlib import redirect_stdout
 
-
-fillerFile = 'filler.py'
+# Constant variables
+FILLER_FILE = 'filler.py'
 
 
 def toText(discordMessage):
@@ -17,31 +17,27 @@ def toText(discordMessage):
     return discordMessage.content
 
 
-def saveToFile(text, fileName):
+def saveToFile(text):
     """Write the text input to output file.
 
     :param text: Text to be saved
     :type text: string
-    :param fileName: Name of the file to save the text string in
-    :type fileName: string
     :return: None
     :rtype: None
     """
-    with open(fileName, 'w', encoding='utf-8') as f:
+    with open(FILLER_FILE, 'w', encoding='utf-8') as f:
         f.write(text)
 
 
-def runTheFile(fileName):
+def runTheFile():
     """Run saved file as Python script.
 
-    :param fileName: Name of the fileName to run as Python script
-    :type fileName: string
     :return: Return of the Python script (lines seperated by \\n)
     :rtype: string
     """
     with io.StringIO() as buf, redirect_stdout(buf):
         try:
-            exec(open(fileName).read())
+            exec(open(FILLER_FILE).read())
         except Exception:
             print('That was gibberish to me!')
         output = buf.getvalue()
@@ -65,19 +61,17 @@ def disectTheResults(output):
     return outputs
 
 
-def processCmd(text, fileName):
-    """Save the text input to output fileName.
+def processCmd(text):
+    """Save the text input to output FILLER_FILE.
 
     :param text: Text to be saved
     :type text: string, optional
-    :param fileName: Name of the fileName to save the text parameter in
-    :type fileName: string
     :return: Return of the Python script
     :rtype: A list of strings where each element represents a line of the
       total return
     """
-    saveToFile(text, fileName)
-    rawOutput = runTheFile(fileName)
+    saveToFile(text)
+    rawOutput = runTheFile()
     return disectTheResults(rawOutput)
 
 
