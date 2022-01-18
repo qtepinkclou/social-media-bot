@@ -5,3 +5,4 @@ Pipfile
 Pipfile.lock
 src/.env
 src/filler.py
+__pycache__

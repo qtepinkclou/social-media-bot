@@ -12,6 +12,8 @@ nest_asyncio.apply()
 
 import os
 
+from detect_landmark import Landmarks
+
 import pydiscmd
 
 from getmedia import SentMedia
@@ -43,13 +45,18 @@ HELP_COMMENTS = {
     'Show a list of saved media under given keyword',
 
     'showMedia':
-    'Acquire saved media under given keyword'
+    'Acquire saved media under given keyword',
+
+    'detectLandmark':
+    'Get the predicted name of the landmark which is in the provided image with the command'
                }
 
 pythonState = defaultdict(str)  # dict containing user:state pairs
 
 sender = SentMedia()  # initialize SentMedia
 saver = SavedMedia()  # initialize SavedMedia
+
+landmark = Landmarks() # initialize Landmarks
 
 config = Config()
 TOKEN = config.get_parameter("DISCORD_TOKEN")  # Abstract token
@@ -192,6 +199,29 @@ async def showMedia(ctx, cmd='fold'):
         for mediaName in mediaDirs:
             await ctx.send(file=sendDiscord(mediaName))
 
+@bot.command(name='detectLandmark', help=HELP_COMMENTS['detectLandmark'])
+async def detectLandmark(ctx):
+    """Detect Landmark."""
+    try:
+        imageUrl = ctx.message.attachments[0].url
+
+    except IndexError:
+
+        print('There are no attachments!')
+        await ctx.send('You did not send a proper image with the command!')
+
+    else:
+        with landmark:
+            predictSet = landmark.main_process(imageUrl)
+
+
+    if len(predictSet) >= 1:
+        await ctx.send("Google Lens supposes this image belongs to:")
+        for prediction in predictSet:
+            await ctx.send("- {} \n".format(prediction))
+
+    else:
+        await ctx.send("Google Lens could not hack it.")
 
 @bot.listen()
 async def on_message(message):
@@ -219,5 +249,5 @@ def main():
     bot.run(TOKEN)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # FIX NEEDED!!!! Do not use this implementation
     main()
