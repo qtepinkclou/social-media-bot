@@ -12,7 +12,7 @@
 
 - Add another feature to functional-discord-bot
 
-- Merge with similar features to form a class
+- Merge with similar features to form a class (later...)
 
 - In the future train your own learning algorithm for landmark detection as well as other detection algorithms and use this file as a quickstart to utilize them in discord.
 

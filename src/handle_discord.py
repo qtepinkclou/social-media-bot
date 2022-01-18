@@ -1,10 +1,14 @@
 """Discord API to host several functionalities.
+
 Currently supported modules are:
     ``pydiscmd``
     ``getmedia``
+    ``detect_landmark``
+    ``captcha_generator``
 """
 
 import nest_asyncio
+import asyncio
 
 # Why doesn't it work when the following line is executed after any other
 # import but works perfectly when located like this?
@@ -14,6 +18,9 @@ import os
 
 from detect_landmark import Landmarks
 
+from captcha_generator import Randomite
+from captcha_generator import MatchError
+
 import pydiscmd
 
 from getmedia import SentMedia
@@ -21,6 +28,7 @@ from getmedia import SavedMedia
 
 from discord import File as sendDiscord
 from discord.ext import commands
+import discord
 
 from collections import defaultdict
 
@@ -53,10 +61,12 @@ HELP_COMMENTS = {
 
 pythonState = defaultdict(str)  # dict containing user:state pairs
 
+captchaControl = Randomite()
+
 sender = SentMedia()  # initialize SentMedia
 saver = SavedMedia()  # initialize SavedMedia
 
-landmark = Landmarks() # initialize Landmarks
+landmark = Landmarks()  # initialize Landmarks
 
 config = Config()
 TOKEN = config.get_parameter("DISCORD_TOKEN")  # Abstract token
@@ -70,6 +80,27 @@ async def on_ready():
     print(
         f'{bot.user.name} is connected to the Discord! \n'
          )
+
+
+@bot.listen()
+async def on_message(message):
+    """Treat the content of the message depending on pythonState."""
+    if message.author == bot.user or message.content.startswith('!'):
+        return
+
+    userName = message.author.name
+
+    if pythonState[userName] == 'running':
+        _message = pydiscmd.toText(message)
+        rawOutputList = pydiscmd.processCmd(_message)
+
+        finalOutputList = [
+                           pydiscmd.modifyOutput(item, mod='o')
+                           for item in rawOutputList
+                           ]
+
+        for _ in finalOutputList:
+            await message.channel.send(_)
 
 
 @bot.command(name='togglePython', help=HELP_COMMENTS['togglePython'])
@@ -199,49 +230,62 @@ async def showMedia(ctx, cmd='fold'):
         for mediaName in mediaDirs:
             await ctx.send(file=sendDiscord(mediaName))
 
+
 @bot.command(name='detectLandmark', help=HELP_COMMENTS['detectLandmark'])
 async def detectLandmark(ctx):
     """Detect Landmark."""
+    await ctx.send('Pass the Captcha Test before getting an answer. You have 20 seconds to submit.')
+
+    def check(m: discord.Message):  # m = discord.Message.
+        return m.author.id == ctx.author.id and m.channel.id == ctx.channel.id
+
+    # generate string
+    captchaString = captchaControl.generate_random_string()
+    # generate image
+    captchaDir = captchaControl.create_captcha_image(
+      captchaString,
+      fonts_dir=captchaControl.permFonts  # fonts directory
+      )
+    # send image
+    await ctx.send(file=sendDiscord(captchaDir))
+
+    # wait for answer
     try:
-        imageUrl = ctx.message.attachments[0].url
+        msg = await bot.wait_for(event='message', check=check, timeout=20.0)
 
-    except IndexError:
-
-        print('There are no attachments!')
-        await ctx.send('You did not send a proper image with the command!')
-
-    else:
-        with landmark:
-            predictSet = landmark.main_process(imageUrl)
-
-
-    if len(predictSet) >= 1:
-        await ctx.send("Google Lens supposes this image belongs to:")
-        for prediction in predictSet:
-            await ctx.send("- {} \n".format(prediction))
-
-    else:
-        await ctx.send("Google Lens could not hack it.")
-
-@bot.listen()
-async def on_message(message):
-    """Treat the content of the message depending on pythonState."""
-    if message.author == bot.user or message.content.startswith('!'):
+    except asyncio.TimeoutError:
+        await ctx.send('Times up on the test, try again.')
         return
 
-    userName = message.author.name
+    else:
+        try:
+            captchaControl.validate_captcha(msg.content)
+        except MatchError:
+            await ctx.send("You failed the Captcha Test, you may try again.")
+            return
+        else:
+            await ctx.send("You have passed the Captcha Test fellow human! Wait for me to check out that building")
+            try:
+                imageUrl = ctx.message.attachments[0].url
 
-    if pythonState[userName] == 'running':
-        _message = pydiscmd.toText(message)
-        rawOutputList = pydiscmd.processCmd(_message)
+            except IndexError:
+                print('There are no attachments!')
+                await ctx.send('You did not send a proper image with the command!')
+                return
 
-        finalOutputList = [
-                           pydiscmd.modifyOutput(item, mod='o')
-                           for item in rawOutputList
-                           ]
+            else:
+                predictSet = None
+                with landmark:
+                    predictSet = landmark.main_process(imageUrl)
 
-        for _ in finalOutputList:
-            await message.channel.send(_)
+                if predictSet:
+                    await ctx.send("Google Lens supposes this image belongs to:")
+                    for prediction in predictSet:
+                        await ctx.send("- {} \n".format(prediction))
+
+                else:
+                    await ctx.send("Google Lens could not hack it.")
+                return
 
 
 def main():

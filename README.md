@@ -11,6 +11,7 @@ This project is under active development.
 1. _pydiscmd_
 2. _getmedia_
 3. _detect_landmark_
+4. _captcha_generator_ (to be used in _detect_landmark_ only at this point)
 
 ## **Changes Log**
 
