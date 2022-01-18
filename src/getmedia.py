@@ -14,6 +14,10 @@ from multiprocessing import Pool
 # Constant variables
 IS_INSTA_PATTERN = re.compile(r'instagram\.com/p/')
 INSTA_SHORTCODE_PATTERN = re.compile(r'/p/(.+)/')
+TEMP_FILE_NAME = 'Temporary'
+TEMP_YT_NAME = 'Temporary/youtube'
+TEMP_INSTA_NAME = 'Temporary/instagram'
+PERM_FILE_NAME = 'Permanent'
 
 
 def blockPrint():
@@ -139,12 +143,12 @@ class SentMedia(Media):
     def __init__(self):
         """Construct method."""
         super().__init__()
-        self.tempFolder = self.checkDirElseCreate('Temporary')
+        self.tempFolder = self.checkDirElseCreate(TEMP_FILE_NAME)
 
     def __enter__(self):
         """Create YT and IG files under ``self.tempFolder`` directory."""
-        self.tempYT = self.checkDirElseCreate('Temporary/youtube')
-        self.tempIG = self.checkDirElseCreate('Temporary/instagram')
+        self.tempYT = self.checkDirElseCreate(TEMP_YT_NAME)
+        self.tempIG = self.checkDirElseCreate(TEMP_INSTA_NAME)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -173,7 +177,7 @@ class SavedMedia(Media):
     def __init__(self):
         """Construct method."""
         super().__init__()
-        self.permFolder = self.checkDirElseCreate('Permanent')
+        self.permFolder = self.checkDirElseCreate(PERM_FILE_NAME)
 
     def saveMedia(self, cmd, *url):
         r"""Abstract class functionality to permanently download media in one command.
