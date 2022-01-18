@@ -10,6 +10,7 @@ This project is under active development.
 
 1. _pydiscmd_
 2. _getmedia_
+3. __detect_landmark__
 
 ## **Changes Log**
 
