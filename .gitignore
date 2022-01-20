@@ -1,8 +1,8 @@
-src/Permanent/*
-src/Temporary/*
+Permanent/*
+Temporary/*
 docs/*
 Pipfile
 Pipfile.lock
 src/.env
-src/filler.py
+filler.py
 __pycache__

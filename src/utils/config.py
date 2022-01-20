@@ -5,7 +5,7 @@ from dotenv import dotenv_values
 
 
 class Config:
-    def __init__(self, key_file='.env'):
+    def __init__(self, key_file='src/.env'):
         """Construct method."""
         self.configuration = dotenv_values(key_file)
 

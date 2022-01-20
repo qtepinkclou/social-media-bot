@@ -16,15 +16,15 @@ nest_asyncio.apply()
 
 import os
 
-from detect_landmark import Landmarks
+from src.detect_landmark import Landmarks
 
-from captcha_generator import Randomite
-from captcha_generator import MatchError
+from src.captcha_generator import Randomite
+from src.captcha_generator import MatchError
 
-import pydiscmd
+import src.pydiscmd
 
-from getmedia import SentMedia
-from getmedia import SavedMedia
+from src.getmedia import SentMedia
+from src.getmedia import SavedMedia
 
 from discord import File as sendDiscord
 from discord.ext import commands
@@ -33,7 +33,7 @@ import discord
 from collections import defaultdict
 
 from datetime import datetime
-from utils.config import Config
+from src.utils.config import Config
 
 # Constant variables
 HELP_COMMENTS = {
@@ -91,11 +91,11 @@ async def on_message(message):
     userName = message.author.name
 
     if pythonState[userName] == 'running':
-        _message = pydiscmd.toText(message)
-        rawOutputList = pydiscmd.processCmd(_message)
+        _message = src.pydiscmd.toText(message)
+        rawOutputList = src.pydiscmd.processCmd(_message)
 
         finalOutputList = [
-                           pydiscmd.modifyOutput(item, mod='o')
+                           src.pydiscmd.modifyOutput(item, mod='o')
                            for item in rawOutputList
                            ]
 
@@ -131,11 +131,7 @@ async def change_state(ctx):
 
 @bot.command(name='sendMedia', help=HELP_COMMENTS['sendMedia'])
 async def sendMedia(ctx, *url):
-    """Directly acquire and do not store media from multiple URLs.
-
-    :param url: Variable length argument list of URLs
-    :type url: List of string
-    """
+    """Directly acquire and do not store media from multiple URLs."""
     startTime = datetime.now()
 
     with sender:
@@ -154,13 +150,7 @@ async def sendMedia(ctx, *url):
 
 @bot.command(name='saveMedia', help=HELP_COMMENTS['saveMedia'])
 async def saveMedia(ctx, cmd, *url):
-    """Save media from multiple URLs under a keyword.
-
-    :param cmd: Keyword related with saved media
-    :type cmd: string
-    :param url: Variable length argument list of URLs
-    :type url: List of string
-    """
+    """Save media from multiple URLs under a keyword."""
     startTime = datetime.now()
 
     saver.saveMedia(cmd, *url)
@@ -180,11 +170,7 @@ async def saveMedia(ctx, cmd, *url):
 
 @bot.command(name='deleteMedia', help=HELP_COMMENTS['deleteMedia'])
 async def deleteMedia(ctx, cmd='fold'):
-    """Delete media related with given keyword.
-
-    :param cmd: Keyword related with saved media
-    :type cmd: string, optional
-    """
+    """Delete media related with given keyword."""
     deletedMediaNames = saver.deleteMedia(cmd)
 
     await ctx.send(
@@ -198,11 +184,7 @@ async def deleteMedia(ctx, cmd='fold'):
 
 @bot.command(name='printMedia', help=HELP_COMMENTS['printMedia'])
 async def printMedia(ctx, cmd='fold'):
-    """Show a list of saved media under given keyword.
-
-    :param cmd: Keyword related with saved media
-    :type cmd: string, optional
-    """
+    """Show a list of saved media under given keyword."""
     savedMediaNames = saver.printExistingMediaNames(cmd)
 
     await ctx.send(
@@ -216,11 +198,7 @@ async def printMedia(ctx, cmd='fold'):
 
 @bot.command(name='showMedia', help=HELP_COMMENTS['showMedia'])
 async def showMedia(ctx, cmd='fold'):
-    """Acquire saved media under given keyword.
-
-    :param cmd: Keyword related with saved media
-    :type cmd: string, optional
-    """
+    """Acquire saved media under given keyword."""
     mediaDirs = saver.showMedia(cmd)
 
     if 'There are no media' in mediaDirs[0]:
@@ -233,7 +211,7 @@ async def showMedia(ctx, cmd='fold'):
 
 @bot.command(name='detectLandmark', help=HELP_COMMENTS['detectLandmark'])
 async def detectLandmark(ctx):
-    """Detect Landmark."""
+    """Detect Landmark if the Captcha Test is passed."""
     await ctx.send('Pass the Captcha Test before getting an answer. You have 20 seconds to submit.')
 
     def check(m: discord.Message):  # m = discord.Message.
