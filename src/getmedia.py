@@ -27,11 +27,7 @@ def enablePrint():
 
 
 class Media(metaclass=ABCMeta):
-    """An abstract Base class to acquire and maintain media from internet.
-
-    :param CWD: Current working directory path
-    :type CWD: string
-    """
+    """An abstract Base class to acquire and maintain media from internet."""
 
     def __init__(self):
         """Construct method."""
@@ -42,13 +38,7 @@ class Media(metaclass=ABCMeta):
                       )
 
     def dlIG(self, path, url):
-        """Download Instagram media from given URL and save to given Path.
-
-        :param path: Path for the file to be saved
-        :type path: string
-        :param url: URL of the media to be downloaded
-        :type url: string
-        """
+        """Download Instagram media from given URL and save to given Path."""
         shortCode = INSTA_SHORTCODE_PATTERN.search(url).group(1)
 
         instance = instaloader.Instaloader(
@@ -63,13 +53,7 @@ class Media(metaclass=ABCMeta):
         instance.download_post(post, target='')
 
     def dlYT(self, path, url):
-        """Download Youtube and Twitter media from given URL and save to given Path.
-
-        :param path: Path for the file to be saved
-        :type path: string
-        :param url: URL of the media to be downloaded
-        :type url: string
-        """
+        """Download Youtube and Twitter media from given URL and save to given Path."""
         optionsYT = {
                      'format': 'best',
                      'outtmpl': '{}/%(title)s'.format(path)+'.mp4',
@@ -83,15 +67,7 @@ class Media(metaclass=ABCMeta):
             enablePrint()
 
     def processMedia(self, pathYT, pathIG, *url):
-        r"""Input URLs to respected methods and save them in given paths.
-
-        :param pathYT: Download path of Youtube and Twitter URLs
-        :type pathYT: string
-        :param pathIG: Download path of Instagram URLs
-        :type pathIG: string
-        :param url: Variable length argument list of URLs
-        :type url: List of string
-        """
+        r"""Input URLs to respected methods and save them in given paths."""
         listOfURLs = list({*url})  # Avoid repetitions
         IG = []
         YT = []
@@ -130,10 +106,6 @@ class SentMedia(Media):
     """Download and remove media inside ``with`` statement.
 
     Works with Youtube, Twitter and Instagram
-
-    :param tempFolder: Absolute path where media will be
-      temporarily downloaded in OS
-    :type tempFolder: string
     """
 
     def __init__(self):
@@ -153,11 +125,7 @@ class SentMedia(Media):
         shutil.rmtree(self.tempIG)
 
     def sendMedia(self, *url):
-        r"""Abstract class functionality to temporarily download media to one command.
-
-        :param url: Variable length argument list of URLs
-        :type url: List of string
-        """
+        """Abstract class functionality to temporarily download media to one command."""
         self.processMedia(self.tempYT, self.tempIG, *url)
 
 
@@ -165,9 +133,6 @@ class SavedMedia(Media):
     """Download and maintain media.
 
     Works with Youtube, Twitter and Instagram
-
-    :param permFolder: Absolute path where media will be downloaded in OS
-    :type permFolder: string
     """
 
     def __init__(self):
@@ -176,28 +141,14 @@ class SavedMedia(Media):
         self.permFolder = self.checkDirElseCreate('Permanent')
 
     def saveMedia(self, cmd, *url):
-        r"""Abstract class functionality to permanently download media in one command.
-
-        :param cmd: Keyword related with saved media
-        :type cmd: string
-        :param url: Variable length argument list of URLs
-        :type url: List of string
-        :return: Titles of saved media
-        :rtype: List of strings
-        """
+        """Abstract class functionality to permanently download media in one command."""
         commandFolder = self.getCommandPath(cmd)
         self.processMedia(commandFolder, commandFolder, *url)
 
         return self.printExistingMediaNames(cmd)
 
     def printExistingMediaNames(self, cmd):
-        """Get titles of media related to command.
-
-        :param cmd: Keyword related with saved media
-        :type cmd: string
-        :return: Titles of media related to command
-        :rtype: List of strings
-        """
+        """Get titles of media related to command."""
         commandFolder = self.getCommandPath(cmd)
 
         if os.path.isdir(commandFolder):
@@ -212,13 +163,7 @@ class SavedMedia(Media):
                 ]
 
     def showMedia(self, cmd):
-        """Get absolute directory path of media related to cmd.
-
-        :param cmd: Keyword related with saved media
-        :type cmd: string
-        :return: Absolute path of media related to command in OS
-        :rtype: List of strings
-        """
+        """Get absolute directory path of media related to cmd."""
         commandFolder = self.getCommandPath(cmd)
 
         if os.path.isdir(commandFolder):
@@ -240,13 +185,7 @@ class SavedMedia(Media):
                 ]
 
     def deleteMedia(self, cmd):
-        """Delete saved media related to command.
-
-        :param cmd: Keyword related with saved media
-        :type cmd: string
-        :return: Deleted titles of media related to command
-        :rtype: List of strings
-        """
+        """Delete saved media related to command."""
         commandFolder = self.getCommandPath(cmd)
 
         if os.path.isdir(commandFolder):
@@ -260,13 +199,7 @@ class SavedMedia(Media):
                 ]
 
     def getCommandPath(self, cmd):
-        """Get the path of command folder.
-
-        :param cmd: Keyword related with saved media
-        :type cmd: string
-        :return: Absolute path of command folder in OS
-        :rtype: string
-        """
+        """Get the path of command folder."""
         commandFolder = self.permFolder + '/' + cmd
         return commandFolder
 

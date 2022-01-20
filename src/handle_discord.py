@@ -1,4 +1,5 @@
 """Discord API to host several functionalities.
+
 Currently supported modules are:
     ``pydiscmd``
     ``getmedia``
@@ -28,25 +29,25 @@ from utils.config import Config
 # Constant variables
 HELP_COMMENTS = {
     'togglePython':
-    'Toggle between Discord chat prompt and Python command prompt.',
+        'Toggle between Discord chat prompt and Python command prompt.',
 
     'sendMedia':
-    'Directly acquire media from multiple URLs',
+        'Directly acquire media from multiple URLs',
 
     'saveMedia':
-    'Save media from multiple URLs under a keyword',
+        'Save media from multiple URLs under a keyword',
 
     'deleteMedia':
-    'Delete media related with given keyword',
+        'Delete media related with given keyword',
 
     'printMedia':
-    'Show a list of saved media under given keyword',
+        'Show a list of saved media under given keyword',
 
     'showMedia':
-    'Acquire saved media under given keyword'
-               }
+        'Acquire saved media under given keyword'
+                 }
 
-pythonState = defaultdict(str)  # dict containing user:state pairs
+PYTHON_STATE = defaultdict(str)  # dict containing user:state pairs
 
 sender = SentMedia()  # initialize SentMedia
 saver = SavedMedia()  # initialize SavedMedia
@@ -68,36 +69,32 @@ async def on_ready():
 @bot.command(name='togglePython', help=HELP_COMMENTS['togglePython'])
 async def change_state(ctx):
     """Toggle between Discord chat prompt and Python command prompt."""
-    global pythonState
+    global PYTHON_STATE
     userName = ctx.author.name
 
-    if userName not in pythonState:
-        pythonState[userName] = 'idle'
+    if userName not in PYTHON_STATE:
+        PYTHON_STATE[userName] = 'idle'
 
-    if pythonState[userName] == 'idle':
+    if PYTHON_STATE[userName] == 'idle':
         await ctx.send(
                        'You can only chat in Python now {}. '
                        'Your Python Mode is ON'.format(userName)
                        )
 
-        pythonState[userName] = 'running'
+        PYTHON_STATE[userName] = 'running'
 
-    elif pythonState[userName] == 'running':
+    elif PYTHON_STATE[userName] == 'running':
         await ctx.send(
                        'You can chat as you wish {}. '
                        'Your Python Mode is OFF'.format(userName)
                        )
 
-        pythonState[userName] = 'idle'
+        PYTHON_STATE[userName] = 'idle'
 
 
 @bot.command(name='sendMedia', help=HELP_COMMENTS['sendMedia'])
 async def sendMedia(ctx, *url):
-    """Directly acquire and do not store media from multiple URLs.
-
-    :param url: Variable length argument list of URLs
-    :type url: List of string
-    """
+    """Directly acquire and do not store media from multiple URLs."""
     startTime = datetime.now()
 
     with sender:
@@ -116,13 +113,7 @@ async def sendMedia(ctx, *url):
 
 @bot.command(name='saveMedia', help=HELP_COMMENTS['saveMedia'])
 async def saveMedia(ctx, cmd, *url):
-    """Save media from multiple URLs under a keyword.
-
-    :param cmd: Keyword related with saved media
-    :type cmd: string
-    :param url: Variable length argument list of URLs
-    :type url: List of string
-    """
+    """Save media from multiple URLs under a keyword."""
     startTime = datetime.now()
 
     saver.saveMedia(cmd, *url)
@@ -142,11 +133,7 @@ async def saveMedia(ctx, cmd, *url):
 
 @bot.command(name='deleteMedia', help=HELP_COMMENTS['deleteMedia'])
 async def deleteMedia(ctx, cmd='fold'):
-    """Delete media related with given keyword.
-
-    :param cmd: Keyword related with saved media
-    :type cmd: string, optional
-    """
+    """Delete media related with given keyword."""
     deletedMediaNames = saver.deleteMedia(cmd)
 
     await ctx.send(
@@ -160,11 +147,7 @@ async def deleteMedia(ctx, cmd='fold'):
 
 @bot.command(name='printMedia', help=HELP_COMMENTS['printMedia'])
 async def printMedia(ctx, cmd='fold'):
-    """Show a list of saved media under given keyword.
-
-    :param cmd: Keyword related with saved media
-    :type cmd: string, optional
-    """
+    """Show a list of saved media under given keyword."""
     savedMediaNames = saver.printExistingMediaNames(cmd)
 
     await ctx.send(
@@ -178,11 +161,7 @@ async def printMedia(ctx, cmd='fold'):
 
 @bot.command(name='showMedia', help=HELP_COMMENTS['showMedia'])
 async def showMedia(ctx, cmd='fold'):
-    """Acquire saved media under given keyword.
-
-    :param cmd: Keyword related with saved media
-    :type cmd: string, optional
-    """
+    """Acquire saved media under given keyword."""
     mediaDirs = saver.showMedia(cmd)
 
     if 'There are no media' in mediaDirs[0]:
@@ -195,18 +174,18 @@ async def showMedia(ctx, cmd='fold'):
 
 @bot.listen()
 async def on_message(message):
-    """Treat the content of the message depending on pythonState."""
+    """Treat the content of the message depending on PYTHON_STATE."""
     if message.author == bot.user or message.content.startswith('!'):
         return
 
     userName = message.author.name
 
-    if pythonState[userName] == 'running':
-        _message = pydiscmd.toText(message)
-        rawOutputList = pydiscmd.processCmd(_message)
+    if PYTHON_STATE[userName] == 'running':
+        _message = pydiscmd.to_text(message)
+        rawOutputList = pydiscmd.process_cmd(_message)
 
         finalOutputList = [
-                           pydiscmd.modifyOutput(item, mod='o')
+                           pydiscmd.modify_output(item, mod='o')
                            for item in rawOutputList
                            ]
 
