@@ -41,7 +41,7 @@ class Landmarks():
 
     def __enter__(self):
         """Enter function."""
-        self.tempGL = self.checkDirElseCreate(TEMP_GOOGLE_LENS_FILE)
+        self.tempGL = self.dir_create(TEMP_GOOGLE_LENS_FILE)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -93,7 +93,7 @@ class Landmarks():
 
         return predictSet
 
-    def checkDirElseCreate(self, folderName):
+    def dir_create(self, folderName):
         """Check if directory exist, create it if it does not."""
         path = self.CWD + '/' + folderName
 

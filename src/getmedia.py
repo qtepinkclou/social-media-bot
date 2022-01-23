@@ -20,12 +20,12 @@ TEMP_INSTA_NAME = 'Temporary/instagram'
 PERM_FILE_NAME = 'Permanent'
 
 
-def blockPrint():
+def block_print():
     """Toggle block all print statements in script."""
     sys.stdout = open(os.devnull, 'w')
 
 
-def enablePrint():
+def enable_print():
     """Toggle enable all print statements in script."""
     sys.stdout = sys.__stdout__
 
@@ -41,7 +41,7 @@ class Media(metaclass=ABCMeta):
                       os.getcwd()  # string
                       )
 
-    def dlIG(self, path, url):
+    def download_insta(self, path, url):
         """Download Instagram media from given URL and save to given Path."""
         shortCode = INSTA_SHORTCODE_PATTERN.search(url).group(1)
 
@@ -56,7 +56,7 @@ class Media(metaclass=ABCMeta):
         post = Post.from_shortcode(instance.context, shortCode)
         instance.download_post(post, target='')
 
-    def dlYT(self, path, url):
+    def download_youtube(self, path, url):
         """Download Youtube and Twitter media from given URL and save to given Path."""
         optionsYT = {
                      'format': 'best',
@@ -66,11 +66,11 @@ class Media(metaclass=ABCMeta):
                      }
 
         with YoutubeDL(optionsYT) as ydl:
-            blockPrint()
+            block_print()
             ydl.download([url])
-            enablePrint()
+            enable_print()
 
-    def processMedia(self, pathYT, pathIG, *url):
+    def process_media(self, pathYT, pathIG, *url):
         """Input URLs to respected methods and save them in given paths."""
         listOfURLs = list({*url})  # Avoid repetitions
         IG = []
@@ -86,18 +86,18 @@ class Media(metaclass=ABCMeta):
         # If there is only one URL, do not initiate Pool for YT
         if len(YT) > 1:
             with Pool() as pool:
-                pool.starmap(self.dlYT, YT)
+                pool.starmap(self.download_youtube, YT)
         elif len(YT) == 1:
-            self.dlYT(YT[0][0], YT[0][1])
+            self.download_youtube(YT[0][0], YT[0][1])
 
         # If there is only one URL, do not initiate Pool for IG
         if len(IG) > 1:
             with Pool() as pool:
-                pool.starmap(self.dlIG, IG)
+                pool.starmap(self.download_insta, IG)
         elif len(IG) == 1:
-            self.dlIG(IG[0][0], IG[0][1])
+            self.download_insta(IG[0][0], IG[0][1])
 
-    def checkDirElseCreate(self, folderName):
+    def dir_create(self, folderName):
         """Check if directory exist, create it if it does not."""
         path = self.CWD + '/' + folderName
 
@@ -115,12 +115,12 @@ class SentMedia(Media):
     def __init__(self):
         """Construct method."""
         super().__init__()
-        self.tempFolder = self.checkDirElseCreate(TEMP_FILE_NAME)
+        self.tempFolder = self.dir_create(TEMP_FILE_NAME)
 
     def __enter__(self):
         """Create YT and IG files under ``self.tempFolder`` directory."""
-        self.tempYT = self.checkDirElseCreate(TEMP_YT_NAME)
-        self.tempIG = self.checkDirElseCreate(TEMP_INSTA_NAME)
+        self.tempYT = self.dir_create(TEMP_YT_NAME)
+        self.tempIG = self.dir_create(TEMP_INSTA_NAME)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -128,9 +128,9 @@ class SentMedia(Media):
         shutil.rmtree(self.tempYT)
         shutil.rmtree(self.tempIG)
 
-    def sendMedia(self, *url):
+    def send_media(self, *url):
         """Abstract class functionality to temporarily download media to one command."""
-        self.processMedia(self.tempYT, self.tempIG, *url)
+        self.process_media(self.tempYT, self.tempIG, *url)
 
 
 class SavedMedia(Media):
@@ -139,18 +139,18 @@ class SavedMedia(Media):
     def __init__(self):
         """Construct method."""
         super().__init__()
-        self.permFolder = self.checkDirElseCreate(PERM_FILE_NAME)
+        self.permFolder = self.dir_create(PERM_FILE_NAME)
 
-    def saveMedia(self, cmd, *url):
+    def save_media(self, cmd, *url):
         """Abstract class functionality to permanently download media."""
-        commandFolder = self.getCommandPath(cmd)
-        self.processMedia(commandFolder, commandFolder, *url)
+        commandFolder = self.get_command_path(cmd)
+        self.process_media(commandFolder, commandFolder, *url)
 
-        return self.printExistingMediaNames(cmd)
+        return self.show_media_names(cmd)
 
-    def printExistingMediaNames(self, cmd):
+    def show_media_names(self, cmd):
         """Get titles of media related to command."""
-        commandFolder = self.getCommandPath(cmd)
+        commandFolder = self.get_command_path(cmd)
 
         if os.path.isdir(commandFolder):
 
@@ -163,34 +163,34 @@ class SavedMedia(Media):
                 ' \' {} \''.format(cmd)
                 ]
 
-    def showMedia(self, cmd):
+    def show_media(self, cmd):
         """Get absolute directory path of media related to cmd."""
-        commandFolder = self.getCommandPath(cmd)
+        commandFolder = self.get_command_path(cmd)
 
         if os.path.isdir(commandFolder):
 
-            showMediaList = []
+            show_mediaList = []
             names = os.listdir(commandFolder)
 
             for i in range(len(names)):
-                showMediaList.append(commandFolder
+                show_mediaList.append(commandFolder
                                      + '/'
                                      + names[i]
                                      )
 
-            return showMediaList
+            return show_mediaList
 
         return [
                 'There is no media linked '
                 'with the command \' {} \''.format(cmd)
                 ]
 
-    def deleteMedia(self, cmd):
+    def show_media(self, cmd):
         """Delete saved media related to command."""
-        commandFolder = self.getCommandPath(cmd)
+        commandFolder = self.get_command_path(cmd)
 
         if os.path.isdir(commandFolder):
-            deletedMediaList = self.printExistingMediaNames(cmd)
+            deletedMediaList = self.show_media_names(cmd)
             shutil.rmtree(commandFolder)
             return deletedMediaList
 
@@ -199,11 +199,7 @@ class SavedMedia(Media):
                 'with the command \' {} \''.format(cmd)
                 ]
 
-    def getCommandPath(self, cmd):
+    def get_command_path(self, cmd):
         """Get the path of command folder."""
         commandFolder = self.permFolder + '/' + cmd
         return commandFolder
-
-
-if __name__ == '__main__':
-    print('madela')

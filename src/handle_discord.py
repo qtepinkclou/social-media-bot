@@ -91,11 +91,11 @@ async def on_message(message):
     userName = message.author.name
 
     if pythonState[userName] == 'running':
-        _message = src.pydiscmd.toText(message)
-        rawOutputList = src.pydiscmd.processCmd(_message)
+        _message = src.pydiscmd.to_text(message)
+        rawOutputList = src.pydiscmd.process_command(_message)
 
         finalOutputList = [
-                           src.pydiscmd.modifyOutput(item, mod='o')
+                           src.pydiscmd.modify_output(item, mod='o')
                            for item in rawOutputList
                            ]
 
@@ -130,12 +130,12 @@ async def change_state(ctx):
 
 
 @bot.command(name='sendMedia', help=HELP_COMMENTS['sendMedia'])
-async def sendMedia(ctx, *url):
+async def send_media(ctx, *url):
     """Directly acquire and do not store media from multiple URLs."""
     startTime = datetime.now()
 
     with sender:
-        sender.sendMedia(*url)
+        sender.send_media(*url)
 
         for mediaName in os.listdir(sender.tempYT):
             await ctx.send(file=sendDiscord(sender.tempYT + '/' + mediaName))
@@ -149,18 +149,18 @@ async def sendMedia(ctx, *url):
 
 
 @bot.command(name='saveMedia', help=HELP_COMMENTS['saveMedia'])
-async def saveMedia(ctx, cmd, *url):
+async def save_media(ctx, cmd, *url):
     """Save media from multiple URLs under a keyword."""
     startTime = datetime.now()
 
-    saver.saveMedia(cmd, *url)
+    saver.save_media(cmd, *url)
 
     await ctx.send(
                    'Saved the following media and linked '
                    'them with command \' {} \':'.format(cmd)
                    )
 
-    for savedMediaName in saver.printExistingMediaNames(cmd):
+    for savedMediaName in saver.show_media_names(cmd):
         await ctx.send(savedMediaName)
 
     timeTook = datetime.now() - startTime
@@ -169,9 +169,9 @@ async def saveMedia(ctx, cmd, *url):
 
 
 @bot.command(name='deleteMedia', help=HELP_COMMENTS['deleteMedia'])
-async def deleteMedia(ctx, cmd='fold'):
+async def delete_media(ctx, cmd='fold'):
     """Delete media related with given keyword."""
-    deletedMediaNames = saver.deleteMedia(cmd)
+    deletedMediaNames = saver.delete_media(cmd)
 
     await ctx.send(
                    'Deleted following media linked '
@@ -183,9 +183,9 @@ async def deleteMedia(ctx, cmd='fold'):
 
 
 @bot.command(name='printMedia', help=HELP_COMMENTS['printMedia'])
-async def printMedia(ctx, cmd='fold'):
+async def print_media(ctx, cmd='fold'):
     """Show a list of saved media under given keyword."""
-    savedMediaNames = saver.printExistingMediaNames(cmd)
+    savedMediaNames = saver.show_media_names(cmd)
 
     await ctx.send(
                    'The command \' {} \' has the following '
@@ -197,9 +197,9 @@ async def printMedia(ctx, cmd='fold'):
 
 
 @bot.command(name='showMedia', help=HELP_COMMENTS['showMedia'])
-async def showMedia(ctx, cmd='fold'):
+async def show_media(ctx, cmd='fold'):
     """Acquire saved media under given keyword."""
-    mediaDirs = saver.showMedia(cmd)
+    mediaDirs = saver.show_media(cmd)
 
     if 'There are no media' in mediaDirs[0]:
         await ctx.send(mediaDirs[0])
@@ -210,7 +210,7 @@ async def showMedia(ctx, cmd='fold'):
 
 
 @bot.command(name='detectLandmark', help=HELP_COMMENTS['detectLandmark'])
-async def detectLandmark(ctx):
+async def detect_landmarks(ctx):
     """Detect Landmark if the Captcha Test is passed."""
     await ctx.send('Pass the Captcha Test before getting an answer. You have 20 seconds to submit.')
 
@@ -236,6 +236,7 @@ async def detectLandmark(ctx):
         return
 
     else:
+        # if answer is true carry on..
         try:
             captchaControl.validate_captcha(msg.content)
         except MatchError:

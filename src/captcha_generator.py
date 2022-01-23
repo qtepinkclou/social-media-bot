@@ -33,8 +33,8 @@ class Randomite():
                       '/',     # replace
                       os.getcwd()  # string
                       )
-        self.tempCaptcha = self.checkDirElseCreate(TEMP_CAPTCHA_FILE)
-        self.permFonts = self.checkDirElseCreate(PERM_FONT_TYPES_FOLDER)
+        self.tempCaptcha = self.dir_create(TEMP_CAPTCHA_FILE)
+        self.permFonts = self.dir_create(PERM_FONT_TYPES_FOLDER)
         self.captchaImagePath = self.tempCaptcha + '/' + CAPTCHA_IMAGE_NAME
 
     def delete_captcha(self):
@@ -88,7 +88,7 @@ class Randomite():
         else:
             return boolResult
 
-    def checkDirElseCreate(self, folderName):  # This is becoming too common!
+    def dir_create(self, folderName):  # This is becoming too common!
         """Check if directory exist, create it if it does not."""
         path = self.CWD + '/' + folderName
 
