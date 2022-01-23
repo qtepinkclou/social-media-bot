@@ -59,7 +59,7 @@ HELP_COMMENTS = {
     'Get the predicted name of the landmark which is in the provided image with the command'
                }
 
-pythonState = defaultdict(str)  # dict containing user:state pairs
+PYTHON_STATE = defaultdict(str)  # dict containing user:state pairs
 
 captchaControl = Randomite()
 
@@ -84,13 +84,13 @@ async def on_ready():
 
 @bot.listen()
 async def on_message(message):
-    """Treat the content of the message depending on pythonState."""
+    """Treat the content of the message depending on PYTHON_STATE."""
     if message.author == bot.user or message.content.startswith('!'):
         return
 
     userName = message.author.name
 
-    if pythonState[userName] == 'running':
+    if PYTHON_STATE[userName] == 'running':
         _message = src.pydiscmd.to_text(message)
         rawOutputList = src.pydiscmd.process_command(_message)
 
@@ -106,27 +106,27 @@ async def on_message(message):
 @bot.command(name='togglePython', help=HELP_COMMENTS['togglePython'])
 async def change_state(ctx):
     """Toggle between Discord chat prompt and Python command prompt."""
-    global pythonState
+    global PYTHON_STATE
     userName = ctx.author.name
 
-    if userName not in pythonState:
-        pythonState[userName] = 'idle'
+    if userName not in PYTHON_STATE:
+        PYTHON_STATE[userName] = 'idle'
 
-    if pythonState[userName] == 'idle':
+    if PYTHON_STATE[userName] == 'idle':
         await ctx.send(
                        'You can only chat in Python now {}. '
                        'Your Python Mode is ON'.format(userName)
                        )
 
-        pythonState[userName] = 'running'
+        PYTHON_STATE[userName] = 'running'
 
-    elif pythonState[userName] == 'running':
+    elif PYTHON_STATE[userName] == 'running':
         await ctx.send(
                        'You can chat as you wish {}. '
                        'Your Python Mode is OFF'.format(userName)
                        )
 
-        pythonState[userName] = 'idle'
+        PYTHON_STATE[userName] = 'idle'
 
 
 @bot.command(name='sendMedia', help=HELP_COMMENTS['sendMedia'])
