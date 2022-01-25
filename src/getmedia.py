@@ -120,7 +120,7 @@ class SentMedia(Media):
         shutil.rmtree(self.temp_instagram)
 
     def send_media(self, *url):
-        """Abstract class functionality to temporarily download media to one command."""
+        """Abstract class functionality to temporarily download media."""
         self.process_media(self.temp_youtube, self.temp_instagram, *url)
 
 

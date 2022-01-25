@@ -107,7 +107,7 @@ async def change_state(ctx):
         await ctx.send(
             f'You can only chat in Python now {user_name}. '
             'Your Python Mode is ON'
-                       )
+        )
 
         python_state[user_name] = 'running'
 
@@ -115,7 +115,7 @@ async def change_state(ctx):
         await ctx.send(
             f'You can chat as you wish {user_name}. '
             'Your Python Mode is OFF'
-                       )
+        )
 
         python_state[user_name] = 'idle'
 
@@ -129,10 +129,18 @@ async def send_media(ctx, *url):
         sender.send_media(*url)
 
         for media_name in os.listdir(sender.temp_youtube):
-            await ctx.send(file=sendDiscord(sender.temp_youtube + '/' + media_name))
+            await ctx.send(
+                file=sendDiscord(
+                    sender.temp_youtube + '/' + media_name
+                )
+            )
 
         for media_name in os.listdir(sender.temp_instagram):
-            await ctx.send(file=sendDiscord(sender.temp_instagram + '/' + media_name))
+            await ctx.send(
+                file=sendDiscord(
+                    sender.temp_instagram + '/' + media_name
+                )
+            )
 
     time_took = datetime.now() - start_time
 
@@ -209,7 +217,9 @@ async def detect_landmarks(ctx):
     )
 
     def check(msg: discord.Message):  # msg = discord.Message.
-        return msg.author.id == ctx.author.id and msg.channel.id == ctx.channel.id
+        return (msg.author.id == ctx.author.id
+                and msg.channel.id == ctx.channel.id
+                )
 
     # generate string
     captcha_string = captchaControl.generate_random_string()
@@ -241,13 +251,16 @@ async def detect_landmarks(ctx):
                 'You have passed the Captcha Test '
                 'fellow human! Wait for me to check'
                 'out that building'
-                           )
+            )
             try:
                 image_url = ctx.message.attachments[0].url
 
             except IndexError:
                 print('There are no attachments!')
-                await ctx.send('You did not send a proper image with the command!')
+
+                await ctx.send(
+                    'You did not send a proper image with the command!'
+                )
                 return
 
             else:
@@ -256,7 +269,9 @@ async def detect_landmarks(ctx):
                     predict_set = landmark.main_process(image_url)
 
                 if predict_set:
-                    await ctx.send("Google Lens supposes this image belongs to:")
+                    await ctx.send(
+                        'Google Lens supposes this image belongs to:'
+                    )
                     for prediction in predict_set:
                         await ctx.send(f'- {prediction} \n')
 
