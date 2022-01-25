@@ -1,29 +1,31 @@
 """Top level functions for turning Discord message input to Python command."""
 
 import io
+import runpy
 from contextlib import redirect_stdout
 
+
 # Constant variables
-FILLER_FILE = 'filler.py'
+FILLER_FILE_NAME = 'FILLER'
 
 
-def to_text(discordMessage):
+def to_text(discord_message):
     """Extract the string of text from discord message."""
-    return discordMessage.content
+    return discord_message.content
 
 
 def save_to_file(text):
     """Write the text input to output file."""
-    with open(FILLER_FILE, 'w', encoding='utf-8') as f:
-        f.write(text)
+    with open(FILLER_FILE_NAME + '.py', 'w', encoding='utf-8') as file:
+        file.write(text)
 
 
 def run_the_file():
     """Run saved file as Python script."""
     with io.StringIO() as buf, redirect_stdout(buf):
         try:
-            exec(open(FILLER_FILE).read())
-        except Exception:
+            runpy.run_module(mod_name=FILLER_FILE_NAME)
+        except (SyntaxError, NameError):
             print('That was gibberish to me!')
         output = buf.getvalue()
     return output
@@ -35,15 +37,14 @@ def disect_results(output):
                else 'Nothing to put out!'
                for item in output.rstrip('\n').split('\n')
                ]
-
     return outputs
 
 
 def process_command(text):
     """Save the text input to output FILLER_FILE."""
     save_to_file(text)
-    rawOutput = run_the_file()
-    return disect_results(rawOutput)
+    raw_output = run_the_file()
+    return disect_results(raw_output)
 
 
 def modify_output(text, mod=None):
@@ -52,6 +53,6 @@ def modify_output(text, mod=None):
     Use ``mod=o`` in order to get orange colored text as output
     """
     if mod == 'o':
-        return '```fix\n{}\n```'.format(text)
-    else:
-        return text
+        return f'```fix\n{text}\n```'
+
+    return text
