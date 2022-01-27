@@ -44,14 +44,15 @@ class Landmarks(Commons):
     def __init__(self):
         """Construct."""
         super().__init__()
-        temp_google_lens = cfg.get_param('TEMP_GOOGLE_LENS_FILE')
 
         self.discordapp_pattern = re.compile(
             cfg.get_param('DISCORDAPP_PATTERN')
         )
 
         self.current_image_dir = 'None'
-        self.temp_google_lens = self.dir_create(temp_google_lens)
+        self.temp_google_lens = self.dir_create(
+            cfg.get_param('TEMP_GOOGLE_LENS_FILE')
+        )
 
     def __enter__(self):
         """Enter function."""

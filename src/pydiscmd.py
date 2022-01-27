@@ -1,6 +1,7 @@
 """Top level functions for turning Discord message input to Python command."""
 
 import io
+import os
 import runpy
 from contextlib import redirect_stdout
 from utils.config import Config
@@ -47,10 +48,15 @@ class PyCmd(Commons):
         ]
         return self.current_output_list
 
+    def delete_the_file(self):
+        """Delete the file."""
+        os.remove(self.filler_path)
+
     def process_command(self, text):
         """Save the text input to output FILLER_FILE."""
         self.save_to_file(text)
         raw_output_list = self.run_the_file()
+        self.delete_the_file()
         return raw_output_list
 
     def modify_output(self, raw_text, mod=None):
