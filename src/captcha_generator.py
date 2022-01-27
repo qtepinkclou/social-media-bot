@@ -2,46 +2,40 @@
 
 import string
 import random
-import os
-import re
 import shutil
 from captcha.image import ImageCaptcha
+from utils.config import Config
+from commons import Commons
 
-CAPTCHA_LENGTH = 5  # number of characters in the string.
-CAPTCHA_HEIGHT = 200
-CAPTCHA_WIDTH = 320
-TEMP_CAPTCHA_FILE = 'Temporary/_Captcha'
-CAPTCHA_IMAGE_NAME = 'CAPTCHA.png'
-
-# You need .ttf files in the below directory.
-PERM_FONT_TYPES_FOLDER = 'Permanent/_Captcha/fonts'
+cfg = Config()
 
 
 class MatchError(Exception):
     """Raise this if captcha does not match the input."""
 
 
-class Randomite():
+class Randomite(Commons):
     """Generate Captcha and verify safe use."""
 
     def __init__(self):
         """Construct."""
-        self.cwd = re.sub(
-            '\\\\',  # pattern
-            '/',     # replace
-            os.getcwd()  # string
-        )
+        super().__init__()
+        temp_captcha_file = cfg.get_param('TEMP_CAPTCHA_FILE')
+
         self.current_captcha_string = 'None'
-        self.temp_captcha = self.dir_create(TEMP_CAPTCHA_FILE)
-        self.perm_fonts = self.dir_create(PERM_FONT_TYPES_FOLDER)
-        self.captcha_image_path = self.temp_captcha + '/' + CAPTCHA_IMAGE_NAME
+        self.temp_captcha = self.dir_create(temp_captcha_file)
 
     def delete_captcha(self):
         """Delete created captcha."""
         shutil.rmtree(self.temp_captcha)
 
-    def generate_random_string(self, length=CAPTCHA_LENGTH):
+    def generate_random_string(self, **kwargs):
         """Generate random string of characters."""
+        length = kwargs.get(
+            'length',
+            cfg.get_param('CAPTCHA_LENGTH', var_type='int')
+        )
+
         self.current_captcha_string = ''.join(random.choices(
             string.ascii_lowercase
             + string.digits,
@@ -50,34 +44,36 @@ class Randomite():
         )
         return self.current_captcha_string
 
-    def create_captcha_image(self, text, fonts_dir=None):
+    def create_captcha_image(self, text, **kwargs):
         """Create captcha given string."""
-        fonts_dir = fonts_dir if fonts_dir else None
+        captcha_image_name = kwargs.get(
+            'captcha_image_name',
+            cfg.get_param('CAPTCHA_IMAGE_NAME')
+        )
 
-        try:
-            each_font = [fonts_dir + '/' + fontName
-                         for fontName in
-                         os.listdir(fonts_dir)
-                         ]
+        captcha_height = kwargs.get(
+            'captcha_height',
+            cfg.get_param('CAPTCHA_HEIGHT', var_type='int')
+        )
 
-        except TypeError:
-            print("No .ttf files found.")
-            image = ImageCaptcha(
-                width=CAPTCHA_WIDTH,
-                height=CAPTCHA_HEIGHT,
-                font_sizes=[100]
-            )
-        else:
-            image = ImageCaptcha(
-                width=CAPTCHA_WIDTH,
-                height=CAPTCHA_HEIGHT,
-                fonts=each_font,
-                font_sizes=[100 for i in each_font]
-            )
+        captcha_width = kwargs.get(
+            'captcha_width',
+            cfg.get_param('CAPTCHA_WIDTH', var_type='int')
+        )
 
-        finally:
-            image.write(text, self.captcha_image_path)
-        return self.captcha_image_path
+        captcha_font_sizes = kwargs.get(
+            'captcha_font_sizes',
+            cfg.get_param('CAPTCHA_FONT_SIZES', var_type='Lint')
+        )
+
+        image = ImageCaptcha(
+            width=captcha_width,
+            height=captcha_height,
+            font_sizes=captcha_font_sizes
+        )
+        path = self.temp_captcha + '/' + captcha_image_name
+        image.write(text, path)
+        return path
 
     def validate_captcha(self, response):
         """Validate if input string is randomly generated text."""
@@ -85,11 +81,3 @@ class Randomite():
         if bool_result is False:
             raise MatchError
         return bool_result
-
-    def dir_create(self, folder_name):  # This is becoming too common!
-        """Check if directory exist, create it if it does not."""
-        path = self.cwd + '/' + folder_name
-
-        if os.path.isdir(path) is False:
-            os.makedirs(folder_name)
-        return path

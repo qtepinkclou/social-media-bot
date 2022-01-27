@@ -4,36 +4,35 @@
 import os
 import shutil
 import re
-from abc import ABCMeta
-from multiprocessing import Pool
 import instaloader
+from multiprocessing import Pool
 from instaloader import Post
 from youtube_dl import YoutubeDL
+from utils.config import Config
+from commons import Commons
 
 
-# Constant variables
-IS_INSTA_PATTERN = re.compile(r'instagram\.com/p/')
-INSTA_SHORTCODE_PATTERN = re.compile(r'/p/(.+)/')
-TEMP_FILE_NAME = 'Temporary'
-TEMP_YT_NAME = 'Temporary/youtube'
-TEMP_INSTA_NAME = 'Temporary/instagram'
-PERM_FILE_NAME = 'Permanent'
+cfg = Config()
 
 
-class Media(metaclass=ABCMeta):
-    """An abstract Base class to acquire and maintain media from internet."""
+class Media(Commons):
+    """An abstract class to acquire and maintain media from internet."""
 
     def __init__(self):
         """Construct method."""
-        self.cwd = re.sub(  # current working directory
-            '\\\\',  # pattern
-            '/',     # replace
-            os.getcwd()  # string
+        super().__init__()
+
+        self.insta_pattern = re.compile(
+            cfg.get_param('INSTA_PATTERN')
+        )
+
+        self.insta_shortcode_pattern = re.compile(
+            cfg.get_param('INSTA_SHORTCODE_PATTERN')
         )
 
     def download_insta(self, save_folder, url):
         """Download Instagram media from given URL and save to given Path."""
-        insta_shortcode = INSTA_SHORTCODE_PATTERN.search(url).group(1)
+        insta_shortcode = self.insta_shortcode_pattern.search(url).group(1)
         path = self.cwd + '/' + save_folder
 
         instance = instaloader.Instaloader(
@@ -52,7 +51,7 @@ class Media(metaclass=ABCMeta):
         path = self.cwd + '/' + save_folder
         options_youtube = {
             'format': 'best',
-            'outtmpl': path + '.mp4',
+            'outtmpl': path + '/' + '%(title)s.mp4',
             'noplaylist': True,
             'extract-audio': True,
         }
@@ -68,7 +67,7 @@ class Media(metaclass=ABCMeta):
 
         # Assign each URL to its respective method
         for url in list_of_urls:
-            if IS_INSTA_PATTERN.search(url):
+            if self.insta_pattern.search(url):
                 instagram_bundle.append([instagram_folder, url])
             else:
                 youtube_bundle.append([youtube_folder, url])
@@ -88,14 +87,6 @@ class Media(metaclass=ABCMeta):
         elif len(instagram_bundle) == 1:
             self.download_insta(instagram_bundle[0][0], instagram_bundle[0][1])
 
-    def dir_create(self, folder_name):
-        """Check if directory exist, create it if it does not."""
-        path = self.cwd + '/' + folder_name
-
-        if os.path.isdir(path) is False:
-            os.makedirs(folder_name)
-        return path
-
 
 class SentMedia(Media):
     """Download and remove media inside ``with`` statement.
@@ -106,12 +97,18 @@ class SentMedia(Media):
     def __init__(self):
         """Construct method."""
         super().__init__()
-        self.temp_folder_name = TEMP_FILE_NAME
-        self.temp_youtube = TEMP_YT_NAME
-        self.temp_instagram = TEMP_INSTA_NAME
+        self.temp_file_name = self.dir_create(
+            cfg.get_param('TEMP_FILE_NAME')
+        )
 
     def __enter__(self):
         """Create YT and IG files under ``self.tempFolder`` directory."""
+        self.temp_youtube = self.dir_create(
+            cfg.get_param('TEMP_YT_NAME')
+        )
+        self.temp_instagram = self.dir_create(
+            cfg.get_param('TEMP_INSTA_NAME')
+        )
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -130,19 +127,20 @@ class SavedMedia(Media):
     def __init__(self):
         """Construct method."""
         super().__init__()
-        self.perm_folder = PERM_FILE_NAME
+        self.perm_file = self.dir_create(
+            cfg.get_param('PERM_FILE_NAME')
+        )
 
     def save_media(self, cmd, *url):
         """Abstract class functionality to permanently download media."""
-        command_folder = self.get_command_path(cmd)
+        command_folder = self.get_command_folder(cmd)
         self.process_media(command_folder, command_folder, *url)
 
         return self.show_media_names(cmd)
 
     def show_media_names(self, cmd):
         """Get titles of media related to command."""
-        command_folder = self.get_command_path(cmd)
-
+        command_folder = self.get_command_folder(cmd)
         if os.path.isdir(command_folder):
 
             media_names_list = os.listdir(command_folder)
@@ -156,19 +154,18 @@ class SavedMedia(Media):
 
     def show_media(self, cmd):
         """Get absolute directory path of media related to cmd."""
-        command_folder = self.get_command_path(cmd)
-
+        command_folder = self.get_command_folder(cmd)
         if os.path.isdir(command_folder):
 
             show_media_list = []
             names = os.listdir(command_folder)
 
-            for index in enumerate(names):
-                show_media_list.append(
-                    command_folder
-                    + '/'
-                    + names[index[0]]
-                )
+            show_media_list = [
+                self.cwd
+                + '/' + command_folder
+                + '/' + name
+                for name in names
+            ]
 
             return show_media_list
 
@@ -180,8 +177,7 @@ class SavedMedia(Media):
 
     def delete_media(self, cmd):
         """Delete saved media related to command."""
-        command_folder = self.get_command_path(cmd)
-
+        command_folder = self.get_command_folder(cmd)
         if os.path.isdir(command_folder):
             deleted_media_list = self.show_media_names(cmd)
             shutil.rmtree(command_folder)
@@ -193,7 +189,6 @@ class SavedMedia(Media):
             f'\' {cmd} \''
         ]
 
-    def get_command_path(self, cmd):
-        """Get the path of command folder."""
-        command_folder = self.perm_folder + '/' + cmd
-        return command_folder
+    def get_command_folder(self, cmd):
+        """Get command folder."""
+        return self.perm_file + '/' + cmd

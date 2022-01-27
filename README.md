@@ -2,8 +2,6 @@
 
 **bananaBread** is a Python library for managing a Discord Bot.
 
-Scripts are written in Python 3.9.7
-
 This project is under active development.
 
 **Currently supported modules are**
@@ -13,17 +11,25 @@ This project is under active development.
 3. _detect_landmark_
 4. _captcha_generator_ (to be used in _detect_landmark_ only at this point)
 
+## **Notes to End Users**
+
+- To be able to use this program, refer to [link](https://www.writebots.com/discord-bot-token/) for step by step configuration of your own discord bot. Add the bot to one of your servers and run _main.py_
+
+- In order to use !detectLandmark bot command, you need to have your own Google Cloud account which should be authenticated as a service account then its credentials should be added as an environment variable. For more information refer to [link.](https://cloud.google.com/docs/authentication/production#windows)
+
 ## **Changes Log**
 
 - Created two different requirements.txt, added _pdoc3_ as a requirement.
 
-- Primitive use of _config.py_ is implemented.
+- _config.py_ is implemented.
 
-- Constants in each module correctly placed and named according to PEP8.
+- README file markup language changed from **.rst** to **.md**.
+
+- Conformity to PEP8 acquired.
 
 - Changed _pydiscmd.py_ structure. (Will be gathered under a single class soon)
 
-- README file markup language changed from **.rst** to **.md**.
+
 
 ## **Identified Problems**
 

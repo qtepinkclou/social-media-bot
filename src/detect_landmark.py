@@ -26,30 +26,32 @@
 
 """
 
-import os
 import shutil
 import uuid
 import re
 import io
 import requests
 from google.cloud import vision
+from utils.config import Config
+from commons import Commons
 
-IS_DISCORDAPP_PATTERN = re.compile(r'discordapp\.com')
-TEMP_GOOGLE_LENS_FILE = 'Temporary/GoogleLens'
+cfg = Config()
 
 
-class Landmarks():
+class Landmarks(Commons):
     """API to use Google Lens."""
 
     def __init__(self):
         """Construct."""
-        self.cwd = re.sub(
-            '\\\\',  # pattern
-            '/',     # replace
-            os.getcwd()  # string
+        super().__init__()
+        temp_google_lens = cfg.get_param('TEMP_GOOGLE_LENS_FILE')
+
+        self.discordapp_pattern = re.compile(
+            cfg.get_param('DISCORDAPP_PATTERN')
         )
+
         self.current_image_dir = 'None'
-        self.temp_google_lens = self.dir_create(TEMP_GOOGLE_LENS_FILE)
+        self.temp_google_lens = self.dir_create(temp_google_lens)
 
     def __enter__(self):
         """Enter function."""
@@ -61,12 +63,19 @@ class Landmarks():
 
     def get_image(self, image_url):
         """Save image sent from discord."""
-        if IS_DISCORDAPP_PATTERN.search(image_url):
+        if self.discordapp_pattern.search(image_url):
+
             req = requests.get(image_url, stream=True)
+
             self.current_image_dir = self.temp_google_lens + \
                 '/' + str(uuid.uuid4()) + '.jpg'
-            with open(self.current_image_dir, 'wb') as out_file:
-                print('Saving image:' + self.current_image_dir)
+
+            with open(
+                self.current_image_dir,
+                'w',
+                encoding='utf-8'
+            ) as out_file:
+
                 shutil.copyfileobj(req.raw, out_file)
 
         return self.current_image_dir
@@ -75,7 +84,11 @@ class Landmarks():
         """Detect landmarks in the file."""
         client = vision.ImageAnnotatorClient()
 
-        with io.open(self.current_image_dir, 'rb') as image_file:
+        with io.open(
+            self.current_image_dir,
+            'rb',
+            encoding='utf-8'
+        ) as image_file:
             content = image_file.read()
 
             image = vision.Image(content=content)
@@ -102,11 +115,3 @@ class Landmarks():
         predict_set = self.detect_landmarks()
 
         return predict_set
-
-    def dir_create(self, folder_name):
-        """Check if directory exist, create it if it does not."""
-        path = self.cwd + '/' + folder_name
-
-        if os.path.isdir(path) is False:
-            os.makedirs(folder_name)
-        return path

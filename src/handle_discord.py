@@ -7,63 +7,41 @@ Currently supported modules are:
     ``captcha_generator``
 """
 
-from datetime import datetime
-from collections import defaultdict
+
 import os
 import asyncio
+import nest_asyncio
 import discord
+from datetime import datetime
+from collections import defaultdict
 from discord.ext import commands
 from discord import File as sendDiscord
-import nest_asyncio
-
 from utils.config import Config
+from pydiscmd import PyCmd
 from getmedia import SavedMedia
 from getmedia import SentMedia
-import pydiscmd
 from captcha_generator import MatchError
 from captcha_generator import Randomite
 from detect_landmark import Landmarks
 
 nest_asyncio.apply()
 
-# Constant variables
-HELP_COMMENTS = {
-    'togglePython':
-    'Toggle between Discord chat prompt and Python command prompt.',
-
-    'sendMedia':
-    'Directly acquire media from multiple URLs',
-
-    'saveMedia':
-    'Save media from multiple URLs under a keyword',
-
-    'deleteMedia':
-    'Delete media related with given keyword',
-
-    'printMedia':
-    'Show a list of saved media under given keyword',
-
-    'showMedia':
-    'Acquire saved media under given keyword',
-
-    'detectLandmark':
-    'Get the predicted name of the landmark which is '
-    'in the provided image with the command'
-}
-
 python_state = defaultdict(str)  # dict containing user:state pairs
+
+cfg = Config()
+
+conv = PyCmd()
 
 captchaControl = Randomite()
 
-sender = SentMedia()  # initialize SentMedia
-saver = SavedMedia()  # initialize SavedMedia
+sender = SentMedia()
+saver = SavedMedia()
 
-landmark = Landmarks()  # initialize Landmarks
-
-config = Config()
-TOKEN = config.get_parameter("DISCORD_TOKEN")  # Abstract token
+landmark = Landmarks()
 
 bot = commands.Bot(command_prefix='!')
+
+TOKEN = cfg.get_param("DISCORD_TOKEN")
 
 
 @bot.event
@@ -83,19 +61,18 @@ async def on_message(message):
     user_name = message.author.name
 
     if python_state[user_name] == 'running':
-        _message = pydiscmd.to_text(message)
-        raw_output_list = pydiscmd.process_command(_message)
+        raw_output_list = conv.process_command(message)
 
         final_output_list = [
-            pydiscmd.modify_output(item, mod='o')
+            conv.modify_output(item, mod='o')
             for item in raw_output_list
         ]
 
-        for _ in final_output_list:
-            await message.channel.send(_)
+        for output_line in final_output_list:
+            await message.channel.send(output_line)
 
 
-@bot.command(name='togglePython', help=HELP_COMMENTS['togglePython'])
+@bot.command(name='togglePython', help=cfg.get_param('TOOGLE_PYTHON'))
 async def change_state(ctx):
     """Toggle between Discord chat prompt and Python command prompt."""
     user_name = ctx.author.name
@@ -120,7 +97,7 @@ async def change_state(ctx):
         python_state[user_name] = 'idle'
 
 
-@bot.command(name='sendMedia', help=HELP_COMMENTS['sendMedia'])
+@bot.command(name='sendMedia', help=cfg.get_param('SEND_MEDIA'))
 async def send_media(ctx, *url):
     """Directly acquire and do not store media from multiple URLs."""
     start_time = datetime.now()
@@ -147,7 +124,7 @@ async def send_media(ctx, *url):
     await ctx.send(f'Process time: {time_took} seconds.')
 
 
-@bot.command(name='saveMedia', help=HELP_COMMENTS['saveMedia'])
+@bot.command(name='saveMedia', help=cfg.get_param('SAVE_MEDIA'))
 async def save_media(ctx, cmd, *url):
     """Save media from multiple URLs under a keyword."""
     start_time = datetime.now()
@@ -167,7 +144,7 @@ async def save_media(ctx, cmd, *url):
     await ctx.send(f'Process time: {time_took} seconds.')
 
 
-@bot.command(name='deleteMedia', help=HELP_COMMENTS['deleteMedia'])
+@bot.command(name='deleteMedia', help=cfg.get_param('DELETE_MEDIA'))
 async def delete_media(ctx, cmd='fold'):
     """Delete media related with given keyword."""
     deleted_media_names = saver.delete_media(cmd)
@@ -181,7 +158,7 @@ async def delete_media(ctx, cmd='fold'):
         await ctx.send(deleted_media_name)
 
 
-@bot.command(name='printMedia', help=HELP_COMMENTS['printMedia'])
+@bot.command(name='printMedia', help=cfg.get_param('PRINT_MEDIA'))
 async def print_media(ctx, cmd='fold'):
     """Show a list of saved media under given keyword."""
     saved_media_names = saver.show_media_names(cmd)
@@ -195,7 +172,7 @@ async def print_media(ctx, cmd='fold'):
         await ctx.send(saved_media_name)
 
 
-@bot.command(name='showMedia', help=HELP_COMMENTS['showMedia'])
+@bot.command(name='showMedia', help=cfg.get_param('SHOW_MEDIA'))
 async def show_media(ctx, cmd='fold'):
     """Acquire saved media under given keyword."""
     media_dirs = saver.show_media(cmd)
@@ -208,7 +185,7 @@ async def show_media(ctx, cmd='fold'):
             await ctx.send(file=sendDiscord(media_name))
 
 
-@bot.command(name='detectLandmark', help=HELP_COMMENTS['detectLandmark'])
+@bot.command(name='detectLandmark', help=cfg.get_param('DETECT_LANDMARK'))
 async def detect_landmarks(ctx):
     """Detect Landmark if the Captcha Test is passed."""
     await ctx.send(
@@ -225,9 +202,7 @@ async def detect_landmarks(ctx):
     captcha_string = captchaControl.generate_random_string()
     # generate image
     captcha_dir = captchaControl.create_captcha_image(
-        captcha_string,
-        fonts_dir=captchaControl.perm_fonts  # fonts directory
-    )
+        captcha_string)
     # send image
     await ctx.send(file=sendDiscord(captcha_dir))
 
@@ -256,8 +231,6 @@ async def detect_landmarks(ctx):
                 image_url = ctx.message.attachments[0].url
 
             except IndexError:
-                print('There are no attachments!')
-
                 await ctx.send(
                     'You did not send a proper image with the command!'
                 )
