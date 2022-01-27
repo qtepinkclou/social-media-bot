@@ -15,7 +15,7 @@ This project is under active development.
 
 - To be able to use this program, refer to [link](https://www.writebots.com/discord-bot-token/) for step by step configuration of your own discord bot. Add the bot to one of your servers and run _main.py_
 
-- In order to use !detectLandmark bot command, you need to have your own Google Cloud account which should be authenticated as a service account then its credentials should be added as an environment variable. For more information refer to [link.](https://cloud.google.com/docs/authentication/production#windows)
+- In order to use !detectLandmark bot command, you need to have your own Google Cloud account which should be authenticated as a service account. After this process account credentials should be added as an environment variable. For more information refer to [link.](https://cloud.google.com/docs/authentication/production#windows)
 
 ## **Changes Log**
 
@@ -27,13 +27,13 @@ This project is under active development.
 
 - Conformity to PEP8 acquired.
 
-- Changed _pydiscmd.py_ structure. (Will be gathered under a single class soon)
+- Changed _pydiscmd.py_ structure.
 
 
 
 ## **Identified Problems**
 
-- _pdoc3_ cannot document most of the functions in _handle_discord_. Refer to script until fixed.
+- _pdoc3_ cannot document most of the functions in _handle_discord.py_. Refer to script until fixed.
 
 - Due to an error yet unknown, media downloads are sometimes halted, but does not break the code. Check terminal to ensure there is no error until it is fixed.
 
