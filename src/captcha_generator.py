@@ -20,14 +20,14 @@ class Randomite(Commons):
     def __init__(self):
         """Construct."""
         super().__init__()
-        temp_captcha_file = cfg.get_param('TEMP_CAPTCHA_FILE')
-
         self.current_captcha_string = 'None'
-        self.temp_captcha = self.dir_create(temp_captcha_file)
+        self.temp_captcha_file = self.dir_create(
+            cfg.get_param('TEMP_CAPTCHA_FILE')
+        )
 
     def delete_captcha(self):
         """Delete created captcha."""
-        shutil.rmtree(self.temp_captcha)
+        shutil.rmtree(self.temp_captcha_file)
 
     def generate_random_string(self, **kwargs):
         """Generate random string of characters."""
@@ -71,7 +71,7 @@ class Randomite(Commons):
             height=captcha_height,
             font_sizes=captcha_font_sizes
         )
-        path = self.temp_captcha + '/' + captcha_image_name
+        path = self.temp_captcha_file + '/' + captcha_image_name
         image.write(text, path)
         return path
 
