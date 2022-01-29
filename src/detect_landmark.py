@@ -31,6 +31,7 @@ import uuid
 import re
 import io
 import requests
+from pathlib import Path
 from google.cloud import vision
 from utils.config import Config
 from commons import Commons
@@ -60,7 +61,11 @@ class Landmarks(Commons):
 
     def __exit__(self, exc_type, exc_value, traceback):
         """Exit function."""
-        shutil.rmtree(self.temp_google_lens)
+        _ = [
+            f.unlink() for
+            f in Path(self.temp_google_lens).glob('*')
+            if f.is_file()
+        ]
 
     def get_image(self, image_url):
         """Save image sent from discord."""
@@ -73,8 +78,7 @@ class Landmarks(Commons):
 
             with open(
                 self.current_image_dir,
-                'w',
-                encoding='utf-8'
+                'wb',
             ) as out_file:
 
                 shutil.copyfileobj(req.raw, out_file)
@@ -87,8 +91,7 @@ class Landmarks(Commons):
 
         with io.open(
             self.current_image_dir,
-            'rb',
-            encoding='utf-8'
+            'rb'
         ) as image_file:
             content = image_file.read()
 
