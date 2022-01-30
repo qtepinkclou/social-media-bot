@@ -2,6 +2,7 @@
 
 import os
 from abc import ABCMeta
+from pathlib import Path
 
 
 class Commons(metaclass=ABCMeta):
@@ -11,10 +12,25 @@ class Commons(metaclass=ABCMeta):
         """Construct."""
         self.cwd = os.getcwd()
 
-    def dir_create(self, folder_name):
-        """Check if directory exist, create it if it does not."""
-        path = self.cwd + '/' + folder_name
+    def get_path(self, *args):
+        """Get path of file/folder in CWD by passing directories below CWD."""
+        path = self.cwd
+        for respective in args:
+            path += '/' + respective
+        return path
 
-        if os.path.isdir(path) is False:
-            os.makedirs(folder_name)
-        return folder_name
+    @staticmethod
+    def dir_create(folder_path):
+        """Check if directory exist, create it if it does not."""
+        if os.path.isdir(folder_path) is False:
+            os.makedirs(folder_path)
+        return folder_path
+
+    @staticmethod
+    def delete_files_in_path(folder_path):
+        """Delete files in path."""
+        _ = [
+            file.unlink() for
+            file in Path(folder_path).glob('*')
+            if file.is_file()
+        ]
