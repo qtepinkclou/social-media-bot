@@ -31,12 +31,10 @@ import uuid
 import re
 import io
 import requests
-from pathlib import Path
+import constants as cnst
 from google.cloud import vision
-from utils.config import Config
-from commons import Commons
 
-cfg = Config()
+from commons import Commons
 
 
 class Landmarks(Commons):
@@ -46,13 +44,14 @@ class Landmarks(Commons):
         """Construct."""
         super().__init__()
 
+        self.current_image_dir = ''
+
         self.discordapp_pattern = re.compile(
-            cfg.get_param('DISCORDAPP_PATTERN')
+            cnst.DISCORDAPP_PATTERN
         )
 
-        self.current_image_dir = 'None'
         self.temp_google_lens = self.dir_create(
-            cfg.get_param('TEMP_GOOGLE_LENS_FILE')
+            cnst.TEMP_GOOGLE_LENS_FOLDER
         )
 
     def __enter__(self):
@@ -61,11 +60,7 @@ class Landmarks(Commons):
 
     def __exit__(self, exc_type, exc_value, traceback):
         """Exit function."""
-        _ = [
-            f.unlink() for
-            f in Path(self.temp_google_lens).glob('*')
-            if f.is_file()
-        ]
+        self.delete_files_in_path(self.temp_google_lens)
 
     def get_image(self, image_url):
         """Save image sent from discord."""
@@ -73,8 +68,10 @@ class Landmarks(Commons):
 
             req = requests.get(image_url, stream=True)
 
-            self.current_image_dir = self.temp_google_lens + \
-                '/' + str(uuid.uuid4()) + '.jpg'
+            self.current_image_dir = self.temp_google_lens \
+                + '/' \
+                + str(uuid.uuid4()) \
+                + '.jpg'
 
             with open(
                 self.current_image_dir,
@@ -85,12 +82,13 @@ class Landmarks(Commons):
 
         return self.current_image_dir
 
-    def detect_landmarks(self):
+    @staticmethod
+    def detect_landmarks(image_dir):
         """Detect landmarks in the file."""
         client = vision.ImageAnnotatorClient()
 
         with io.open(
-            self.current_image_dir,
+            image_dir,
             'rb'
         ) as image_file:
             content = image_file.read()
@@ -115,7 +113,7 @@ class Landmarks(Commons):
 
     def main_process(self, image_url):
         """Do the thing."""
-        self.current_image_dir = self.get_image(image_url)
-        predict_set = self.detect_landmarks()
+        image_dir = self.get_image(image_url)
+        predict_set = self.detect_landmarks(image_dir)
 
         return predict_set

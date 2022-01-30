@@ -2,12 +2,9 @@
 
 import string
 import random
-import shutil
+import constants as cnst
 from captcha.image import ImageCaptcha
-from utils.config import Config
 from commons import Commons
-
-cfg = Config()
 
 
 class MatchError(Exception):
@@ -20,20 +17,22 @@ class Randomite(Commons):
     def __init__(self):
         """Construct."""
         super().__init__()
-        self.current_captcha_string = 'None'
-        self.temp_captcha_file = self.dir_create(
-            cfg.get_param('TEMP_CAPTCHA_FILE')
+
+        self.current_captcha_string = ''
+
+        self.temp_captcha_folder = self.dir_create(
+            cnst.TEMP_CAPTCHA_FOLDER
         )
 
     def delete_captcha(self):
         """Delete created captcha."""
-        shutil.rmtree(self.temp_captcha_file)
+        self.delete_files_in_path(self.temp_captcha_folder)
 
     def generate_random_string(self, **kwargs):
         """Generate random string of characters."""
         length = kwargs.get(
             'length',
-            cfg.get_param('CAPTCHA_LENGTH', var_type='int')
+            cnst.CAPTCHA_LENGTH
         )
 
         self.current_captcha_string = ''.join(random.choices(
@@ -42,28 +41,29 @@ class Randomite(Commons):
             k=length
         )
         )
+
         return self.current_captcha_string
 
     def create_captcha_image(self, text, **kwargs):
         """Create captcha given string."""
         captcha_image_name = kwargs.get(
             'captcha_image_name',
-            cfg.get_param('CAPTCHA_IMAGE_NAME')
+            cnst.CAPTCHA_IMAGE_NAME
         )
 
         captcha_height = kwargs.get(
             'captcha_height',
-            cfg.get_param('CAPTCHA_HEIGHT', var_type='int')
+            cnst.CAPTCHA_HEIGHT
         )
 
         captcha_width = kwargs.get(
             'captcha_width',
-            cfg.get_param('CAPTCHA_WIDTH', var_type='int')
+            cnst.CAPTCHA_WIDTH
         )
 
         captcha_font_sizes = kwargs.get(
             'captcha_font_sizes',
-            cfg.get_param('CAPTCHA_FONT_SIZES', var_type='Lint')
+            cnst.CAPTCHA_FONT_SIZES
         )
 
         image = ImageCaptcha(
@@ -71,9 +71,12 @@ class Randomite(Commons):
             height=captcha_height,
             font_sizes=captcha_font_sizes
         )
-        path = self.temp_captcha_file + '/' + captcha_image_name
-        image.write(text, path)
-        return path
+        file_path = self.get_path(
+            cnst.TEMP_CAPTCHA_FOLDER,
+            captcha_image_name
+        )
+        image.write(text, file_path)
+        return file_path
 
     def validate_captcha(self, response):
         """Validate if input string is randomly generated text."""

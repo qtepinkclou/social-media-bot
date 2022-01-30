@@ -12,6 +12,7 @@ import os
 import asyncio
 import nest_asyncio
 import discord
+import constants as cnst
 from datetime import datetime
 from collections import defaultdict
 from discord.ext import commands
@@ -72,7 +73,7 @@ async def on_message(message):
             await message.channel.send(output_line)
 
 
-@bot.command(name='togglePython', help=cfg.get_param('TOOGLE_PYTHON'))
+@bot.command(name='togglePython', help=cnst.TOOGLE_PYTHON)
 async def change_state(ctx):
     """Toggle between Discord chat prompt and Python command prompt."""
     user_name = ctx.author.name
@@ -97,7 +98,7 @@ async def change_state(ctx):
         python_state[user_name] = 'idle'
 
 
-@bot.command(name='sendMedia', help=cfg.get_param('SEND_MEDIA'))
+@bot.command(name='sendMedia', help=cnst.SEND_MEDIA)
 async def send_media(ctx, *url):
     """Directly acquire and do not store media from multiple URLs."""
     start_time = datetime.now()
@@ -124,7 +125,7 @@ async def send_media(ctx, *url):
     await ctx.send(f'Process time: {time_took} seconds.')
 
 
-@bot.command(name='saveMedia', help=cfg.get_param('SAVE_MEDIA'))
+@bot.command(name='saveMedia', help=cnst.SAVE_MEDIA)
 async def save_media(ctx, cmd, *url):
     """Save media from multiple URLs under a keyword."""
     start_time = datetime.now()
@@ -144,7 +145,7 @@ async def save_media(ctx, cmd, *url):
     await ctx.send(f'Process time: {time_took} seconds.')
 
 
-@bot.command(name='deleteMedia', help=cfg.get_param('DELETE_MEDIA'))
+@bot.command(name='deleteMedia', help=cnst.DELETE_MEDIA)
 async def delete_media(ctx, cmd='fold'):
     """Delete media related with given keyword."""
     deleted_media_names = saver.delete_media(cmd)
@@ -158,7 +159,7 @@ async def delete_media(ctx, cmd='fold'):
         await ctx.send(deleted_media_name)
 
 
-@bot.command(name='printMedia', help=cfg.get_param('PRINT_MEDIA'))
+@bot.command(name='printMedia', help=cnst.PRINT_MEDIA)
 async def print_media(ctx, cmd='fold'):
     """Show a list of saved media under given keyword."""
     saved_media_names = saver.show_media_names(cmd)
@@ -172,7 +173,7 @@ async def print_media(ctx, cmd='fold'):
         await ctx.send(saved_media_name)
 
 
-@bot.command(name='showMedia', help=cfg.get_param('SHOW_MEDIA'))
+@bot.command(name='showMedia', help=cnst.SHOW_MEDIA)
 async def show_media(ctx, cmd='fold'):
     """Acquire saved media under given keyword."""
     media_dirs = saver.show_media(cmd)
@@ -185,7 +186,7 @@ async def show_media(ctx, cmd='fold'):
             await ctx.send(file=sendDiscord(media_name))
 
 
-@bot.command(name='detectLandmark', help=cfg.get_param('DETECT_LANDMARK'))
+@bot.command(name='detectLandmark', help=cnst.DETECT_LANDMARK)
 async def detect_landmarks(ctx):
     """Detect Landmark if the Captcha Test is passed."""
     await ctx.send(
