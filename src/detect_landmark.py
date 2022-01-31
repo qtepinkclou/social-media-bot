@@ -31,7 +31,7 @@ import uuid
 import re
 import io
 import requests
-import constants as cnst
+import utils.constants as cnst
 from google.cloud import vision
 
 from commons import Commons

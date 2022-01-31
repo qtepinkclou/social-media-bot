@@ -3,7 +3,7 @@
 import io
 import os
 import runpy
-import constants as cnst
+import utils.constants as cnst
 from contextlib import redirect_stdout
 from utils.config import Config
 from commons import Commons

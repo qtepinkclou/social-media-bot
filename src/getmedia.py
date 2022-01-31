@@ -5,7 +5,7 @@ import os
 import shutil
 import re
 import instaloader
-import constants as cnst
+import utils.constants as cnst
 from collections import defaultdict
 from multiprocessing import Pool
 from instaloader import Post

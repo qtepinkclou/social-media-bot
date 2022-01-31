@@ -12,7 +12,7 @@ import os
 import asyncio
 import nest_asyncio
 import discord
-import constants as cnst
+import utils.constants as cnst
 from datetime import datetime
 from collections import defaultdict
 from discord.ext import commands

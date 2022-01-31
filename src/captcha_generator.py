@@ -2,7 +2,7 @@
 
 import string
 import random
-import constants as cnst
+import utils.constants as cnst
 from captcha.image import ImageCaptcha
 from commons import Commons
 
