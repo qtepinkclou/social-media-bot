@@ -5,15 +5,17 @@ import os
 import shutil
 import re
 import instaloader
-import utils.constants as cnst
+import src.utils.constants as cnst
+from abc import ABCMeta
 from collections import defaultdict
 from multiprocessing import Pool
 from instaloader import Post
 from youtube_dl import YoutubeDL
-from commons import Commons
+from src.utils.file_handler import FileHandler
 
+fh = FileHandler()
 
-class Media(Commons):
+class Media(metaclass=ABCMeta):
     """An abstract class to acquire and maintain media from internet."""
 
     def __init__(self):
@@ -30,8 +32,8 @@ class Media(Commons):
 
     def download_insta(self, save_path, url):
         """Download Instagram media from given URL and save to given Path."""
-        insta_shortcode = self.insta_shortcode_pattern.search(url).group(1)
-        save_path = self.dir_create(save_path)
+        insta_shortcode = self.insta_shortcode_pattern.search(url).group(1) ##
+        save_path = fh.dir_create(save_path)
 
         instance = instaloader.Instaloader(
             download_video_thumbnails=False,
@@ -46,7 +48,7 @@ class Media(Commons):
 
     def download_youtube(self, save_path, url):
         """Download Youtube and Twitter media from URL and save it to Path."""
-        save_path = self.dir_create(save_path)
+        save_path = fh.dir_create(save_path)
         options_youtube = {
             'format': 'best',
             'outtmpl': save_path + '/' + '%(title)s.mp4',
@@ -76,7 +78,7 @@ class Media(Commons):
                 pool.starmap(self.download_youtube, youtube_bundle)
 
         elif len(youtube_bundle) == 1:
-            self.download_youtube(youtube_bundle[0][0], youtube_bundle[0][1])
+            self.download_youtube(youtube_bundle[0][0], youtube_bundle[0][1])  ## @# TODO:
 
         # If there is only one URL, do not initiate Pool for IG
         if len(instagram_bundle) > 1:
@@ -100,18 +102,18 @@ class SentMedia(Media):
 
     def __enter__(self):
         """Create YT and IG files under ``self.tempFolder`` directory."""
-        self.temp_youtube = self.dir_create(
+        self.temp_youtube = fh.dir_create(
             cnst.TEMP_YT_FOLDER
         )
-        self.temp_instagram = self.dir_create(
+        self.temp_instagram = fh.dir_create(
             cnst.TEMP_INSTA_FOLDER
         )
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         """Remove temporary YT and IG files directory."""
-        self.delete_files_in_path(self.temp_youtube)
-        self.delete_files_in_path(self.temp_instagram)
+        fh.delete_files_in_path(self.temp_youtube)
+        fh.delete_files_in_path(self.temp_instagram)
 
     def send_media(self, *url):
         """Abstract class functionality to temporarily download media."""
@@ -128,8 +130,8 @@ class SavedMedia(Media):
 
     def save_media(self, cmd, *url):
         """Abstract class functionality to permanently download media."""
-        self.command_folders[cmd] = self.dir_create(
-            self.get_path(
+        self.command_folders[cmd] = fh.dir_create(
+            fh.get_path(
                 cnst.PERM_FOLDER_NAME,
                 cmd
             )
@@ -163,7 +165,7 @@ class SavedMedia(Media):
             media_names = os.listdir(self.command_folders[cmd])
 
             show_media_list = [
-                self.get_path(
+                fh.get_path(
                     cnst.PERM_FOLDER_NAME,
                     cmd,
                     media_name

@@ -31,13 +31,15 @@ import uuid
 import re
 import io
 import requests
-import utils.constants as cnst
+import src.utils.constants as cnst
 from google.cloud import vision
 
-from commons import Commons
+from src.utils.file_handler import FileHandler
+
+fh = FileHandler()
 
 
-class Landmarks(Commons):
+class Landmarks:
     """API to use Google Lens."""
 
     def __init__(self):
@@ -50,7 +52,7 @@ class Landmarks(Commons):
             cnst.DISCORDAPP_PATTERN
         )
 
-        self.temp_google_lens = self.dir_create(
+        self.temp_google_lens = fh.dir_create(
             cnst.TEMP_GOOGLE_LENS_FOLDER
         )
 
@@ -60,7 +62,7 @@ class Landmarks(Commons):
 
     def __exit__(self, exc_type, exc_value, traceback):
         """Exit function."""
-        self.delete_files_in_path(self.temp_google_lens)
+        fh.delete_files_in_path(self.temp_google_lens)
 
     def get_image(self, image_url):
         """Save image sent from discord."""

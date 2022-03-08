@@ -1,12 +1,11 @@
 """Common methods needed by multiple modules."""
 
 import os
-from abc import ABCMeta
 from pathlib import Path
 
 
-class Commons(metaclass=ABCMeta):
-    """Common methods."""
+class FileHandler:
+    """File handling methods."""
 
     def __init__(self):
         """Construct."""

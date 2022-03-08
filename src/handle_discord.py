@@ -6,26 +6,27 @@ Currently supported modules are:
     ``detect_landmark``
     ``captcha_generator``
 """
+import nest_asyncio
+nest_asyncio.apply()
 
 
 import os
 import asyncio
-import nest_asyncio
 import discord
-import utils.constants as cnst
+import src.utils.constants as cnst
 from datetime import datetime
 from collections import defaultdict
 from discord.ext import commands
 from discord import File as sendDiscord
-from utils.config import Config
-from pydiscmd import PyCmd
-from getmedia import SavedMedia
-from getmedia import SentMedia
-from captcha_generator import MatchError
-from captcha_generator import Randomite
-from detect_landmark import Landmarks
+from src.utils.config import Config
+from src.pydiscmd import PyCmd
+from src.getmedia import SavedMedia
+from src.getmedia import SentMedia
+from src.captcha_generator import CaptchaMatchError
+from src.captcha_generator import Randomite
+from src.detect_landmark import Landmarks
 
-nest_asyncio.apply()
+
 
 python_state = defaultdict(str)  # dict containing user:state pairs
 
@@ -42,7 +43,7 @@ landmark = Landmarks()
 
 bot = commands.Bot(command_prefix='!')
 
-TOKEN = cfg.get_param("DISCORD_TOKEN")
+token = cfg.get_param("TOKEN")
 
 
 @bot.event
@@ -256,4 +257,4 @@ async def detect_landmarks(ctx):
 
 def main():
     """Run Discord Bot."""
-    bot.run(TOKEN)
+    bot.run(token)  ## @TODO

@@ -2,16 +2,18 @@
 
 import string
 import random
-import utils.constants as cnst
+import src.utils.constants as cnst
 from captcha.image import ImageCaptcha
-from commons import Commons
+from src.utils.file_handler import FileHandler
+
+fh = FileHandler()
 
 
-class MatchError(Exception):
+class CaptchaMatchError(Exception):
     """Raise this if captcha does not match the input."""
 
 
-class Randomite(Commons):
+class Randomite:
     """Generate Captcha and verify safe use."""
 
     def __init__(self):
@@ -20,20 +22,20 @@ class Randomite(Commons):
 
         self.current_captcha_string = ''
 
-        self.temp_captcha_folder = self.dir_create(
+        self.temp_captcha_folder = fh.dir_create(
             cnst.TEMP_CAPTCHA_FOLDER
         )
 
     def delete_captcha(self):
         """Delete created captcha."""
-        self.delete_files_in_path(self.temp_captcha_folder)
+        fh.delete_files_in_path(self.temp_captcha_folder)
 
     def generate_random_string(self, **kwargs):
         """Generate random string of characters."""
         length = kwargs.get(
             'length',
             cnst.CAPTCHA_LENGTH
-        )
+        )  ##  @TODO
 
         self.current_captcha_string = ''.join(random.choices(
             string.ascii_lowercase
@@ -71,7 +73,7 @@ class Randomite(Commons):
             height=captcha_height,
             font_sizes=captcha_font_sizes
         )
-        file_path = self.get_path(
+        file_path = fh.get_path(
             cnst.TEMP_CAPTCHA_FOLDER,
             captcha_image_name
         )
@@ -82,5 +84,5 @@ class Randomite(Commons):
         """Validate if input string is randomly generated text."""
         bool_result = (response == self.current_captcha_string)
         if bool_result is False:
-            raise MatchError
+            raise CaptchaMatchError
         return bool_result

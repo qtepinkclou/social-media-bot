@@ -1,5 +1,5 @@
 """Main file."""
 
-import handle_discord as Main
+import src.handle_discord as Main
 
 Main.main()

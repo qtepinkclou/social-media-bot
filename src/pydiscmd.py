@@ -3,22 +3,21 @@
 import io
 import os
 import runpy
-import utils.constants as cnst
+import src.utils.constants as cnst
 from contextlib import redirect_stdout
-from utils.config import Config
-from commons import Commons
+from src.utils.config import Config
+from src.utils.file_handler import FileHandler
 
-cfg = Config()
+fh = FileHandler()
 
-
-class PyCmd(Commons):
+class PyCmd:
     """Treat string as if Python command."""
 
     def __init__(self):
         """Construct."""
         super().__init__()
 
-        self.filler_path = self.get_path(
+        self.filler_path = fh.get_path(
             cnst.TEMP_FOLDER_NAME,
             cnst.FILLER_FILE_NAME
         )
