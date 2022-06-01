@@ -1,6 +1,8 @@
-Permanent/*
-Temporary/*
-src/.env
-FILLER.py
-__pycache__
-virtuoso/
+Perm/
+Tmp/
+.env
+user_credentials.json
+__pycache__/
+*~
+*.swp
+*.swo
