@@ -28,7 +28,7 @@ class LandmarkFeatureHandler(commands.Cog):
                 ctx=ctx
             )
         except CaptchaMatchError:
-            return
+            pass
 
         try:
             await landmark_detector.main_process(
@@ -36,4 +36,4 @@ class LandmarkFeatureHandler(commands.Cog):
                 ctx=ctx
             )
         except IncompatibleLinkError:
-            return
+            pass
