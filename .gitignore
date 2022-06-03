@@ -1,6 +1,8 @@
-src/Permanent/*
-src/Temporary/*
-docs/*
-Pipfile
-Pipfile.lock
-src/.env
+Perm/
+Tmp/
+.env
+user_credentials.json
+__pycache__/
+*~
+*.swp
+*.swo
