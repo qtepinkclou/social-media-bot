@@ -6,5 +6,5 @@ class PyCmd:
 
     @classmethod
     def run_the_file(cls, input):
-        """Suspendend for further notice."""
+        """Suspendend until further notice."""
         pass
