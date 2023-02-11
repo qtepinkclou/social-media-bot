@@ -1,4 +1,4 @@
-# **bananaBread**: _A Bot for Social Media Platforms_
+# **bananaDread**: _A Bot for Social Media Platforms_
 
 **bananaBread** is a Python library for managing a Social Media Bot.
 
